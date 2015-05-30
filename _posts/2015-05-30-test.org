@@ -1,0 +1,6 @@
+#+TITLE: What's new today?
+#+LAYOUT: post
+#+TAGS: jekyll org-mode
+
+* Yet another post
+jdkashfkjsdf
