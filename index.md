@@ -1,44 +1,42 @@
 ---
 layout: page
-title: Welcome!
-tagline: Supporting tagline
+title: About me
+tagline: stupidity costs time <i>and</i> money
 ---
 {% include JB/setup %}
 
-Read [Jekyll Quick Start](http://jekyllbootstrap.com/usage/jekyll-quick-start.html)
+First of all I am a learner --- I like to learn.
 
-Complete usage and documentation available at: [Jekyll Bootstrap](http://jekyllbootstrap.com)
+I obtained a Ph.D. in mathematics from the [Freie Universität Berlin](http://www.fu-berlin.de) under the supervision of G. Rote for the [Theoretical Computer Science Work Group](http://www.inf.fu-berlin.de/inst/ag-ti).
+During my doctoral studies I was a member of the [Berlin Mathematical School](http://www.math-berlin.de).
+Currently I work in the data science field.
 
-## Update Author Attributes
+## Contact me
 
-In `_config.yml` remember to specify your own data:
+* [drorata@gmail.com](mailto:drorata@gmail.com)
+* [LinkedIn](https://www.linkedin.com/in/atariah)
 
-    title : My Blog =)
+## Fields of interest
 
-    author :
-      name : Name Lastname
-      email : blah@email.test
-      github : username
-      twitter : username
+* Data crunching and visualizing
+* Python
+* Visualization
+* Computational and Differential Geometry
+* Editor of choice: *emacs*
+* Whenever possible: (La)TeX and friends
 
-The theme should reference these variables whenever needed.
+## Contact Surfaces visualization
 
-## Sample Posts
+<iframe width="400" height="255" src="http://www.youtube.com/embed/SBFwgR4K1Gk?rel=0" frameborder="0" allowfullscreen> </iframe>
 
-This blog contains sample posts which help stage pages and blog data.
-When you don't need the samples anymore just delete the `_posts/core-samples` folder.
+This video visualizes the contact surfaces in the configuration space of a triangular robot which translates and rotates amid planar polygons.
+It illustrates the various possible contacts and their three-dimensional representation.
+The visualization is based on an explicit parameterization of the contact surfaces.
 
-    $ rm -rf _posts/core-samples
+The video was presented at [SoCG 2012](http://socg2012.web.unc.edu/"), Chapel Hill, on June 20th 2012.
+You can download the video:
 
-Here's a sample "posts list".
+* [Full HD version](ftp://ftp.mi.fu-berlin.de/pub/atariah/cspace_visualization_v2.mp4) (~550MB)
+* [Reduced version](ftp://ftp.mi.fu-berlin.de/pub/atariah/Configuration%20Space%20Visualization_reduced.mp4) (~150MB)
 
-<ul class="posts">
-  {% for post in site.posts %}
-    <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ BASE_PATH }}{{ post.url }}">{{ post.title }}</a></li>
-  {% endfor %}
-</ul>
-
-## To-Do
-
-This theme is still unfinished. If you'd like to be added as a contributor, [please fork](http://github.com/plusjade/jekyll-bootstrap)!
-We need to clean up the themes, make theme usage guides with theme-specific markup examples.
+An accompanying paper can be found [here](http://doi.acm.org/10.1145/2261250.2261313") [[BibTeX]](./files/cspace_visualization.bib)
