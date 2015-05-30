@@ -15,10 +15,11 @@
 
 /* Jekyll Bootstrap Colors */
 h1, h2, h3, h4 {
-  color: #f22430;
+    color: #1EBD58;
+    font-size: xx-large
 }
 #footer {
-  background-color: #fdcd60;
+  background-color: #D1E3D7;
 }
 
 
