@@ -1,0 +1,7 @@
+#+TITLE: First blog post
+#+LAYOUT: post
+#+TAGS: jekyll org-mode
+
+* Hi
+So, this is the first post in this blog. I will try to make sure it
+won't be the last...
