@@ -1,0 +1,3 @@
+* Open issues
+** TODO Implement Analytics
+** TODO Add social icons to the header
