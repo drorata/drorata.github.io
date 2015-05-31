@@ -1,8 +1,0 @@
-#+TITLE: Jekyll and Org together
-#+LAYOUT: post
-#+TAGS: jekyll org-mode
-
-* Hi
-Foo
-* World
-Bar {{ site.time }}
