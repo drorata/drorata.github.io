@@ -19,6 +19,8 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
+THEME = 'themes/pelican-alchemy/alchemy'
+
 # Blogroll
 LINKS = (
     ('Pelican', 'http://getpelican.com/'),
