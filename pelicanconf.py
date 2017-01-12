@@ -19,8 +19,6 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
-THEME = 'themes/pelican-alchemy/alchemy'
-
 # Blogroll
 LINKS = (
     ('Pelican', 'http://getpelican.com/'),
@@ -43,5 +41,8 @@ STATIC_PATHS = [
     'extra/favicon.ico'
 ]
 EXTRA_PATH_METADATA = {
-    'extra/favicon.ico': {'path': 'favicon.ico'}
+    'extra/favicon.ico': {'path': 'favicon.ico'},
 }
+
+THEME = 'themes/pelican-alchemy/alchemy'
+SITEIMAGE = '/images/colored-spiral-of-roots.png width=90 height=90'
