@@ -1,3 +1,6 @@
 [submodule "themes/pelican-alchemy"]
 	path = themes/pelican-alchemy
 	url = git@github.com:drorata/pelican-alchemy.git
+[submodule "plugins"]
+	path = plugins
+	url = git@github.com:drorata/pelican-plugins.git
