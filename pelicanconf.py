@@ -53,7 +53,17 @@ EXTRA_PATH_METADATA = {
 }
 
 PLUGIN_PATHS = ["plugins"]
-#PLUGINS = ["render_math"]
+# PLUGINS = ["extract_toc"]#,"render_math"]
+# MD_EXTENSIONS = (['toc',])
+MARKDOWN = {
+    'extension_configs': {
+        'markdown.extensions.codehilite': {'css_class': 'highlight'},
+        'markdown.extensions.extra': {},
+        'markdown.extensions.toc': {},
+        'markdown.extensions.meta': {},
+    },
+    'output_format': 'html5',
+}
 
 THEME = 'themes/pelican-alchemy/alchemy'
 SITEIMAGE = '/images/colored-spiral-of-roots.png width=90 height=90'
