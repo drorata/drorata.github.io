@@ -32,6 +32,9 @@ SOCIAL = (('You can add links in your config file', '#'),
 
 DEFAULT_PAGINATION = 10
 DEFAULT_CATEGORY = 'General'
+DEFAULT_METADATA = {
+    'status': 'draft',
+}
 DISPLAY_PAGES_ON_MENU = True
 DISPLAY_CATEGORIES_ON_MENU = True
 
