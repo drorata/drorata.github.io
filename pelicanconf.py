@@ -67,3 +67,5 @@ MARKDOWN = {
 
 THEME = 'themes/pelican-alchemy/alchemy'
 SITEIMAGE = '/images/colored-spiral-of-roots.png width=90 height=90'
+
+DISQUS_SITENAME = "dr-dror.disqus.com"
