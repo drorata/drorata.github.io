@@ -22,8 +22,6 @@ Lastly, create a new Markdown post and include the following:
 where `factorial-sample.ipynb` is the notebook's filename.
 Don't forget to include in the post (`.md`) the needed metadata like `Title`, `Date` etc.
 
-$\cos(x) = y^2$
-
 ## Example
 
 The next line till the end of the post is coming from a notebook:
