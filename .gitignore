@@ -1,3 +1,5 @@
 __pycache__/
 output/
 .DS_Store
+content/notebooks/.ipynb_checkpoints/
+_nb_header.html
