@@ -53,7 +53,7 @@ EXTRA_PATH_METADATA = {
 }
 
 PLUGIN_PATHS = ["plugins"]
-PLUGINS = ["render_math"]
+PLUGINS = ["render_math", "liquid_tags.notebook"]
 MARKDOWN = {
     'extension_configs': {
         'markdown.extensions.codehilite': {'css_class': 'highlight'},
