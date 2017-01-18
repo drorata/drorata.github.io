@@ -53,8 +53,7 @@ EXTRA_PATH_METADATA = {
 }
 
 PLUGIN_PATHS = ["plugins"]
-# PLUGINS = ["extract_toc"]#,"render_math"]
-# MD_EXTENSIONS = (['toc',])
+PLUGINS = ["render_math"]
 MARKDOWN = {
     'extension_configs': {
         'markdown.extensions.codehilite': {'css_class': 'highlight'},
