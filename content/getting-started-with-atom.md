@@ -1,4 +1,5 @@
 Title: My getting started with Atom
+Date: 2017-01-20
 Category: HowTo
 Tags: atom, python, editor, superuser
 
@@ -33,7 +34,7 @@ By enabling the following two, this package will remind you the beloved `ido` Em
 This allows the highlighting of all the instances of a selected word in the current file.
 Very handy.
 
-![Example](tmp/highlight-selected.gif)
+![Example]({filename}/images/atom-getting-started-highlight-selected.gif)
 
 ### [pretty json](https://atom.io/packages/pretty-json)
 This will simply allow prettifying JSONs.
