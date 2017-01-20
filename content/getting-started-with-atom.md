@@ -2,6 +2,7 @@ Title: My getting started with Atom
 Date: 2017-01-20
 Category: HowTo
 Tags: atom, python, editor, superuser
+Status: published
 
 # Introduction
 
