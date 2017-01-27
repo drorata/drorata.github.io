@@ -67,4 +67,9 @@ MARKDOWN = {
 THEME = 'themes/pelican-alchemy/alchemy'
 SITEIMAGE = '/images/colored-spiral-of-roots.png width=90 height=90'
 
+# Following is used in the base.html of the themes
+# for the inclusion of notebooks using liquid_tags
+# plug in.
+EXTRA_HEADER = open('_nb_header.html').read()
+
 DISQUS_SITENAME = "dr-dror.disqus.com"
