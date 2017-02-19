@@ -1,5 +1,5 @@
 Title: Thoughts about data science teams
-Date: 2017-02-15
+Date: 2017-02-19
 Category: DS
 Tags: team, training, ace
 Summary: Some thoughts about the traits needed to establish a successful data science team.
