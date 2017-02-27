@@ -72,4 +72,4 @@ SITEIMAGE = '/images/colored-spiral-of-roots.png width=90 height=90'
 # plug in.
 EXTRA_HEADER = open('_nb_header.html').read()
 
-DISQUS_SITENAME = "dr-dror.disqus.com"
+DISQUS_SITENAME = "dr-dror"
