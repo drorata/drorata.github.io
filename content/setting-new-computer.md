@@ -1,5 +1,5 @@
 Title: Setting new computer
-Date: 13:30
+Date: 2016-03-16
 Category: General
 Tags: IT, computer, apps, settings, superuser, python
 Status: published

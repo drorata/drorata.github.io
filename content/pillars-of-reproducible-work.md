@@ -1,5 +1,5 @@
 Title: Pillars of reproducible data science work
-Date: 2017-03-15
+Date: 2017-03-16
 Summary: What does it take to have reproducible data science work? Present a minimal example using Docker.
 Status: published
 Tags: docker, jupyter, reproducible, research
