@@ -1,5 +1,6 @@
 Title: Setting new computer
 Date: 2017-03-16
+Modified: 2017-03-22
 Category: General
 Tags: IT, computer, apps, settings, superuser, python
 Status: published
@@ -50,3 +51,12 @@ To that end I used the [Karabiner-Elements](https://github.com/tekezo/Karabiner-
 I'm using `vim` as the editor in the console (mostly when it comes to commit messages for git).
 Still, coloring the editor is nice.
 I Simply added `syntax on` to `~/.vimrc`.
+
+## N.B. 1
+
+After couple of days, as always, there are some additional items to mention:
+
+* [nb conda kernels](https://github.com/Anaconda-Platform/nb_conda_kernels) to treat Conda environments as Jupyter kernels
+* For [decision trees visualization](http://scikit-learn.org/stable/modules/tree.html#classification) I had to install `GraphViz` and `pydotplus`. The former using MacPorts and the latter using `conda install -c conda-forge pydotplus`.
+* [`pandoc`](http://pandoc.org/) is a nice to have around
+* Similarly, [`jq`](https://github.com/stedolan/jq/wiki/Installation) is very important to have around; simply using MacPorts. In addition, ['ack'](https://beyondgrep.com/) is worthy installing
