@@ -74,3 +74,4 @@ AttributeError: 'Visdom' object has no attribute 'mesh'
 ```
 
 It is almost the end of the demo, but still a little annoying; I opened a [bug](https://github.com/facebookresearch/visdom/issues/59).
+It turns out that you'd have to install `Visdom` from the sources and not using `pip` in order to avoid this problem.
