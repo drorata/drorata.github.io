@@ -73,3 +73,6 @@ SITEIMAGE = '/images/colored-spiral-of-roots.png width=90 height=90'
 EXTRA_HEADER = open('_nb_header.html').read()
 
 DISQUS_SITENAME = "dr-dror"
+
+# SEARCH_BOX = True
+HIDE_AUTHORS = True
