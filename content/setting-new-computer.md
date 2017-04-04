@@ -1,6 +1,6 @@
 Title: Setting new computer
 Date: 2017-03-16
-Modified: 2017-03-31
+Modified: 2017-04-04
 Category: General
 Tags: IT, computer, apps, settings, superuser, python
 Status: published
@@ -59,8 +59,15 @@ After couple of days, as always, there are some additional items to mention:
 * [nb conda kernels](https://github.com/Anaconda-Platform/nb_conda_kernels) to treat Conda environments as Jupyter kernels
 * For [decision trees visualization](http://scikit-learn.org/stable/modules/tree.html#classification) I had to install `GraphViz` and `pydotplus`. The former using MacPorts and the latter using `conda install -c conda-forge pydotplus`.
 * [`pandoc`](http://pandoc.org/) is a nice to have around
-* Similarly, [`jq`](https://github.com/stedolan/jq/wiki/Installation) is very important to have around; simply using MacPorts. In addition, ['ack'](https://beyondgrep.com/) is worthy installing
+* Similarly, [`jq`](https://github.com/stedolan/jq/wiki/Installation) is very important to have around; simply using MacPorts. In addition, [`ack`](https://beyondgrep.com/) is worthy installing
 
 ## N.B. 2
 
-* How could I forget, spell checking for Jupyter notebooks and other extensions are a must. This is rather straightforward as described [here](https://github.com/ipython-contrib/jupyter_contrib_nbextensions)
+How could I forget, spell checking for Jupyter notebooks and other extensions are a must. This is rather straightforward as described [here](https://github.com/ipython-contrib/jupyter_contrib_nbextensions).
+
+## N.B. 3
+
+When inspecting a file from the console, it is nice to see it colored properly.
+A nice way to go about it is to install `Pygments`.
+This can be easily done: `conda install Pygments`.
+Next, in `~/.bash_profile` I added the following alias `alias catc='pygmentize -g'`.
