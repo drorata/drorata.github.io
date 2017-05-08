@@ -29,7 +29,12 @@ B.Sc. | Mathematics | Tel-Aviv University | 2007 | Magna Cum Laude
 
 ### Professional Experience
 
-* Lead Data Scientist, [glispa Global Group](http://www.glispa.com), Berlin, Germany (Sep. 2016 – Present)
+* Senior Data Scientist, [reBuy reCommerce GmbH](http://www.rebuy.com), Berlin, Germany (Apr. 2017 – Present)
+Still very fresh, so there's not much to share. Started to work on two analysis projects: (a) multi-channel marketing attribution and (b) pickup lists optimization for logistics.
+<br>
+_Some Highlights:_
+    * TBA
+* Lead Data Scientist, [glispa Global Group](http://www.glispa.com), Berlin, Germany (Sep. 2016 – Apr. 2017)
 After recruiting two data scientists and starting a collaboration with an external team, I was appointed as the lead data scientist. In this position I am primarily responsible for: (a) project and task definition for the distributed team of 6-9 scientists; (b) exploring new technologies and solutions to be used by the team; (c) strengthening the coordination and collaboration between different stakeholders. In addition, I am acting as a contributor to technical work of the team as a playing coach.
 <br>
 _Some Highlights:_
