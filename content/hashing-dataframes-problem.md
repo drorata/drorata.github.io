@@ -1,5 +1,6 @@
 Title: When trying to hash a data frame
 Date: 2017-05-26
+Tags: python, pandas
 Status: published
 
 ## TL;DR
