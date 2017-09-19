@@ -1,0 +1,13 @@
+name: pelican
+channels:
+  - conda-forge
+dependencies:
+  - python=3.6
+  - numpy
+  - pandas
+  - markdown
+  - jupyter
+  - nb_conda
+  - pip:
+    - pelican==3.7.1
+    - gitpython
