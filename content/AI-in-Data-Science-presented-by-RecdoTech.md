@@ -1,5 +1,5 @@
 Title: Messages taken home from "AI in Data Science presented by RecdoTech"
-Status: draft
+Status: published
 Category: DS
 Summary: Some remarks and highlights from taken from a meetup I attended.
 
