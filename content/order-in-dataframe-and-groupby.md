@@ -1,6 +1,8 @@
 Title: The importance of order
 Date: 2017-11-14
 Status: published
+Category: HowTo
+Tags: python, pandas
 Summary: When grouping by DataFrame the order does matter and may be surprising.
 
 Consider the following simply table:
