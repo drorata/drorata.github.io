@@ -8,6 +8,7 @@ dependencies:
   - markdown
   - jupyter
   - nb_conda
+  - ghp-import
   - pip:
     - pelican==3.7.1
     - gitpython
