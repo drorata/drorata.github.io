@@ -5,7 +5,7 @@ Tags: decision, trees, python
 Status: published
 Summary: Playing around with decision trees on a dataset of mushrooms
 
-## Preface 
+## Preface
 
 I have posted a notebook on GitHub where I explore a dataset of mushrooms.
 This dataset together with simple decision trees lets you decide whether a mushroom is poisonous or not.
