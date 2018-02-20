@@ -46,10 +46,12 @@ ARTICLE_SAVE_AS = 'posts/{date:%Y}/{date:%b}/{date:%d}/{slug}/index.html'
 STATIC_PATHS = [
     'images',
     'files',
-    'extra/favicon.ico'
+    'extra/favicon.ico',
+    'extra/keybase.txt'
 ]
 EXTRA_PATH_METADATA = {
     'extra/favicon.ico': {'path': 'favicon.ico'},
+    'extra/keybase.txt': {'path': 'keybase.txt'}
 }
 
 PLUGIN_PATHS = ["plugins"]
