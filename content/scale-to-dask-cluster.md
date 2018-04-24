@@ -14,4 +14,4 @@ So lengthy, that 4 cores of a notebook were working for couple of hours with no 
 This was the point when I decided to explore [`dask`](http://dask.pydata.org/en/latest/) and its sibling [`distributed`](https://distributed.readthedocs.io/en/latest/).
 In this tutorial/post we shall discuss how to take a local code doing grid search using Scikit-Learn to a cluster of AWS (EC2) nodes.
 
-The full tutorial, including source files, can be found [here](https://github.com/rebuy-de/ds-dask_cluster_example), where the [README](https://github.com/rebuy-de/ds-dask_cluster_example/blob/master/README.md) is the entrypoint.
+The full tutorial, including source files, can be found [here](https://github.com/drorata/ds-dask_cluster_example), where the [README](https://github.com/drorata/ds-dask_cluster_example/blob/master/README.md) is the entrypoint.
