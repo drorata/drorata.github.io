@@ -1,5 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Dr. Dror - HowTo</title><link href="http://drorata.github.io/" rel="alternate"></link><link href="http://drorata.github.io/feeds/howto.atom.xml" rel="self"></link><id>http://drorata.github.io/</id><updated>2018-04-24T10:50:42+02:00</updated><entry><title>Moving from local machine to Dask cluster using Terraform</title><link href="http://drorata.github.io/posts/2018/Jan/05/moving-from-local-machine-to-dask-cluster-using-terraform/" rel="alternate"></link><published>2018-01-05T14:39:37+01:00</published><updated>2018-04-24T10:50:42+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-01-05:/posts/2018/Jan/05/moving-from-local-machine-to-dask-cluster-using-terraform/</id><summary type="html">&lt;p&gt;Tutorial on how to start a cluster of dask instances on AWS (EC2). Using this cluster execute an expansive grid search.&lt;/p&gt;</summary><content type="html">&lt;h2 id="introduction"&gt;Introduction&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Dr. Dror - HowTo</title><link href="http://drorata.github.io/" rel="alternate"></link><link href="http://drorata.github.io/feeds/howto.atom.xml" rel="self"></link><id>http://drorata.github.io/</id><updated>2018-09-04T20:55:10+02:00</updated><entry><title>An attempt on smarter logging</title><link href="http://drorata.github.io/posts/2018/Sep/04/an-attempt-on-smarter-logging/" rel="alternate"></link><published>2018-09-04T20:55:10+02:00</published><updated>2018-09-04T20:55:10+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-09-04:/posts/2018/Sep/04/an-attempt-on-smarter-logging/</id><summary type="html">&lt;h2 id="motivation"&gt;Motivation&lt;/h2&gt;
+&lt;p&gt;Consider the case where you implement some logic somewhere, and this logic should be used from within several different places.
+Think of a logic and two apps using it.
+The logic should be yielding logging messages that would be visible as part of the runing of the different apps …&lt;/p&gt;</summary><content type="html">&lt;h2 id="motivation"&gt;Motivation&lt;/h2&gt;
+&lt;p&gt;Consider the case where you implement some logic somewhere, and this logic should be used from within several different places.
+Think of a logic and two apps using it.
+The logic should be yielding logging messages that would be visible as part of the runing of the different apps.
+And here comes the additional requirement; the first app should use STDOUT for logging and the second should write the log messages to a file.
+Or, another possible requirement could be that the logging format should be different depending on the calling app.&lt;/p&gt;
+&lt;p&gt;In other words, the log messages yielded by the logic should merely be piped to one or more handlers managed by the calling app.
+In this example, you will see how I workaround this problem.
+I hope you will find this solution helpful.
+Please comment if you have questions, suggestions etc.&lt;/p&gt;
+&lt;h2 id="the-solution"&gt;The solution&lt;/h2&gt;
+&lt;h3 id="start-with-the-logic"&gt;Start with the logic&lt;/h3&gt;
+&lt;p&gt;Here is a dead simple logic:&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# package1/package1/foo.py&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logging&lt;/span&gt;
+
+&lt;span class="n"&gt;logger&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getLogger&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="vm"&gt;__name__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;foo_func&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;__name__ = &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Info from foo&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;The key line here is the definition of the logger (line 5); it is associated to &lt;code&gt;__name__&lt;/code&gt;.
+This way, whatever &lt;code&gt;__name__&lt;/code&gt; might be, &lt;code&gt;logger&lt;/code&gt; will always be a child of the root logger.
+And this is the trick, namely, an app calling this logic should use the root logger.&lt;/p&gt;
+&lt;h3 id="the-first-app"&gt;The first app&lt;/h3&gt;
+&lt;p&gt;Now we can implement the first app:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/usr/bin/env python3&lt;/span&gt;
+
+&lt;span class="c1"&gt;# package1/package1/app1.py&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logging&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;foo&lt;/span&gt;
+
+&lt;span class="n"&gt;logger&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getLogger&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setLevel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;ch&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;StreamHandler&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;ch&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setLevel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;formatter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Formatter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="si"&gt;%(asctime)s&lt;/span&gt;&lt;span class="s1"&gt; - &lt;/span&gt;&lt;span class="si"&gt;%(name)s&lt;/span&gt;&lt;span class="s1"&gt; - &lt;/span&gt;&lt;span class="si"&gt;%(levelname)s&lt;/span&gt;&lt;span class="s1"&gt; - &lt;/span&gt;&lt;span class="si"&gt;%(message)s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;ch&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setFormatter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;formatter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;addHandler&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ch&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Info from main app1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;__name__ = &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo_func&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note that here the &lt;code&gt;logger&lt;/code&gt; is the root one and we can defined the handler to be used.&lt;/p&gt;
+&lt;h3 id="the-second-app"&gt;The second app&lt;/h3&gt;
+&lt;p&gt;Similarly to the first one, the second should use the root logger as well.
+Check this out:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/usr/bin/env python3&lt;/span&gt;
+
+&lt;span class="c1"&gt;# package2/package2/app2.py&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logging&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;package1.foo&lt;/span&gt; &lt;span class="kn"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;foo&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="n"&gt;logger&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getLogger&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="c1"&gt;# logger = logging.getLogger(&amp;#39;log_example&amp;#39;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setLevel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;ch&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;StreamHandler&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;ch&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setLevel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;formatter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Formatter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="si"&gt;%(levelname)s&lt;/span&gt;&lt;span class="s1"&gt; &amp;lt;-&amp;gt; &lt;/span&gt;&lt;span class="si"&gt;%(asctime)s&lt;/span&gt;&lt;span class="s1"&gt; - &lt;/span&gt;&lt;span class="si"&gt;%(name)s&lt;/span&gt;&lt;span class="s1"&gt; - &lt;/span&gt;&lt;span class="si"&gt;%(message)s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;ch&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setFormatter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;formatter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;addHandler&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ch&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Info from main app2&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;__name__ = &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo_func&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2 id="putting-all-together"&gt;Putting all together&lt;/h2&gt;
+&lt;p&gt;This &lt;a href="https://gitlab.com/drorata/log-example"&gt;git repository&lt;/a&gt; holds a complete example, including a &lt;code&gt;Dockerfile&lt;/code&gt; which allows you to try out this setting.
+Clone the repository and build the docker image.
+Invoke the following from the project's root.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;docker build -t log-example .
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Next, you can simply checkout the different output; compare:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;docker run -it --rm log-example /package1/package1/app1.py
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;which yields:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;2018-08-30 17:08:31,117 - root - INFO - Info from main app1
+2018-08-30 17:08:31,117 - root - INFO - __name__ = __main__
+2018-08-30 17:08:31,117 - foo - INFO - __name__ = foo
+2018-08-30 17:08:31,118 - foo - INFO - Info from foo
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;docker run -it --rm log-example /package2/package2/app2.py
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;which yields:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;INFO &lt;span class="o"&gt;&amp;lt;-&amp;gt;&lt;/span&gt; &lt;span class="m"&gt;2018-08-30&lt;/span&gt; &lt;span class="m"&gt;17&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;08&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;40&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;143&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; root &lt;span class="o"&gt;-&lt;/span&gt; Info from main app2
+INFO &lt;span class="o"&gt;&amp;lt;-&amp;gt;&lt;/span&gt; &lt;span class="m"&gt;2018-08-30&lt;/span&gt; &lt;span class="m"&gt;17&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;08&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;40&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;143&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; root &lt;span class="o"&gt;-&lt;/span&gt; __name__ &lt;span class="o"&gt;=&lt;/span&gt; __main__
+INFO &lt;span class="o"&gt;&amp;lt;-&amp;gt;&lt;/span&gt; &lt;span class="m"&gt;2018-08-30&lt;/span&gt; &lt;span class="m"&gt;17&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;08&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;40&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;144&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; package1.foo &lt;span class="o"&gt;-&lt;/span&gt; __name__ &lt;span class="o"&gt;=&lt;/span&gt; package1.foo
+INFO &lt;span class="o"&gt;&amp;lt;-&amp;gt;&lt;/span&gt; &lt;span class="m"&gt;2018-08-30&lt;/span&gt; &lt;span class="m"&gt;17&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;08&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;40&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;144&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; package1.foo &lt;span class="o"&gt;-&lt;/span&gt; Info from foo
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3 id="two-things-to-note"&gt;Two things to note&lt;/h3&gt;
+&lt;p&gt;First, pay attention to the different &lt;code&gt;__name__&lt;/code&gt;'s in use.
+Understanding them will help you modify this approach as per your needs.
+Secondly, note the different formatting of the messages.
+This is governed by the definitions in the apps and not all by the logic!
+By defining a different or additional handle, you could, for instance, write the log messages when using the second app to a &lt;a href="https://docs.python.org/3/library/logging.handlers.html#logging.handlers.RotatingFileHandler"&gt;rotating file&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;That's it.
+Happy logging!&lt;/p&gt;</content><category term="python"></category></entry><entry><title>Moving from local machine to Dask cluster using Terraform</title><link href="http://drorata.github.io/posts/2018/Jan/05/moving-from-local-machine-to-dask-cluster-using-terraform/" rel="alternate"></link><published>2018-01-05T14:39:37+01:00</published><updated>2018-04-24T10:50:42+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-01-05:/posts/2018/Jan/05/moving-from-local-machine-to-dask-cluster-using-terraform/</id><summary type="html">&lt;p&gt;Tutorial on how to start a cluster of dask instances on AWS (EC2). Using this cluster execute an expansive grid search.&lt;/p&gt;</summary><content type="html">&lt;h2 id="introduction"&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;As part of the never-ending effort to improve reBuy and turn it into a market leader, we recently decided to tackle the challenges of our customer services agents.
 As a first step, a dump of tagged emails was created and the first goal was set: build a POC that tags the emails automatically.
 To that end, NLP had to be used and a lengthy (and greedy) &lt;a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html"&gt;grid search&lt;/a&gt; had to be executed.
