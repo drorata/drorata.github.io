@@ -9,12 +9,12 @@ Status: published
 
 Consider the case where you implement some logic somewhere, and this logic should be used from within several different places.
 Think of a logic and two apps using it.
-The logic should be yielding logging messages that would be visible as part of the runing of the different apps.
+The logic should be yielding logging messages that would be visible as part of the running of the different apps.
 And here comes the additional requirement; the first app should use STDOUT for logging and the second should write the log messages to a file.
 Or, another possible requirement could be that the logging format should be different depending on the calling app.
 
 In other words, the log messages yielded by the logic should merely be piped to one or more handlers managed by the calling app.
-In this example, you will see how I workaround this problem.
+In this example, you will see my workaround this problem.
 I hope you will find this solution helpful.
 Please comment if you have questions, suggestions etc.
 
@@ -38,7 +38,7 @@ def foo_func():
     logger.info('Info from foo')
 ```
 
-The key line here is the definition of the logger (line 5); it is associated to `__name__`.
+The key line here is the definition of the logger (line 5); it is associated with `__name__`.
 This way, whatever `__name__` might be, `logger` will always be a child of the root logger.
 And this is the trick, namely, an app calling this logic should use the root logger.
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     main()
 ```
 
-Note that here the `logger` is the root one and we can defined the handler to be used.
+Note that here the `logger` is the root one and we can define the handler to be used.
 
 
 ### The second app
