@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Dr. Dror</title><link href="http://drorata.github.io/" rel="alternate"></link><link href="http://drorata.github.io/feeds/all.atom.xml" rel="self"></link><id>http://drorata.github.io/</id><updated>2018-09-04T21:04:14+02:00</updated><entry><title>An attempt on smarter logging</title><link href="http://drorata.github.io/posts/2018/Sep/04/an-attempt-on-smarter-logging/" rel="alternate"></link><published>2018-09-04T20:55:10+02:00</published><updated>2018-09-04T21:04:14+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-09-04:/posts/2018/Sep/04/an-attempt-on-smarter-logging/</id><summary type="html">&lt;h2 id="motivation"&gt;Motivation&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Dr. Dror</title><link href="http://drorata.github.io/" rel="alternate"></link><link href="http://drorata.github.io/feeds/all.atom.xml" rel="self"></link><id>http://drorata.github.io/</id><updated>2018-09-04T21:40:44+02:00</updated><entry><title>An attempt on smarter logging</title><link href="http://drorata.github.io/posts/2018/Sep/04/an-attempt-on-smarter-logging/" rel="alternate"></link><published>2018-09-04T20:55:10+02:00</published><updated>2018-09-04T21:40:44+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-09-04:/posts/2018/Sep/04/an-attempt-on-smarter-logging/</id><summary type="html">&lt;h2 id="motivation"&gt;Motivation&lt;/h2&gt;
 &lt;p&gt;Consider the case where you implement some logic somewhere, and this logic should be used from within several different places.
 Think of a logic and two apps using it.
 The logic should be yielding logging messages that would be visible as part of the running of the different apps …&lt;/p&gt;</summary><content type="html">&lt;h2 id="motivation"&gt;Motivation&lt;/h2&gt;
@@ -145,6 +145,7 @@ Understanding them will help you modify this approach as per your needs.
 Secondly, note the different formatting of the messages.
 This is governed by the definitions in the apps and not all by the logic!
 By defining a different or additional handle, you could, for instance, write the log messages when using the second app to a &lt;a href="https://docs.python.org/3/library/logging.handlers.html#logging.handlers.RotatingFileHandler"&gt;rotating file&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Lastly, thanks to &lt;a href="https://github.com/deeplook"&gt;deeplook&lt;/a&gt; for his help :)&lt;/p&gt;
 &lt;p&gt;That's it.
 Happy logging!&lt;/p&gt;</content><category term="python"></category></entry><entry><title>Expose an API for a trained prediction model</title><link href="http://drorata.github.io/posts/2018/May/08/expose-an-api-for-a-trained-prediction-model/" rel="alternate"></link><published>2018-05-08T12:41:16+02:00</published><updated>2018-05-08T12:41:16+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-05-08:/posts/2018/May/08/expose-an-api-for-a-trained-prediction-model/</id><summary type="html">&lt;p&gt;You will build a RESTful API exposing a trained prediction model.&lt;/p&gt;</summary><content type="html">&lt;h2 id="why"&gt;Why?&lt;/h2&gt;
 &lt;p&gt;This is rather clear.
@@ -1075,10 +1076,10 @@ The synthetic&lt;/p&gt;
 
  
  
-&lt;div id="fb33b164-99a3-4513-9613-c92976cfa0b0"&gt;&lt;/div&gt;
+&lt;div id="aa85010d-825c-4360-b09b-31f0eedf159d"&gt;&lt;/div&gt;
 &lt;div class="output_subarea output_widget_view "&gt;
 &lt;script type="text/javascript"&gt;
-var element = $('#fb33b164-99a3-4513-9613-c92976cfa0b0');
+var element = $('#aa85010d-825c-4360-b09b-31f0eedf159d');
 &lt;/script&gt;
 &lt;script type="application/vnd.jupyter.widget-view+json"&gt;
 {"model_id": "fb25d76fed4949658247726a8220da02", "version_major": 2, "version_minor": 0}
