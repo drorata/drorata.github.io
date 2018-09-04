@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Dr. Dror</title><link href="http://drorata.github.io/" rel="alternate"></link><link href="http://drorata.github.io/feeds/all.atom.xml" rel="self"></link><id>http://drorata.github.io/</id><updated>2018-09-04T20:55:10+02:00</updated><entry><title>An attempt on smarter logging</title><link href="http://drorata.github.io/posts/2018/Sep/04/an-attempt-on-smarter-logging/" rel="alternate"></link><published>2018-09-04T20:55:10+02:00</published><updated>2018-09-04T20:55:10+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-09-04:/posts/2018/Sep/04/an-attempt-on-smarter-logging/</id><summary type="html">&lt;h2 id="motivation"&gt;Motivation&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Dr. Dror</title><link href="http://drorata.github.io/" rel="alternate"></link><link href="http://drorata.github.io/feeds/all.atom.xml" rel="self"></link><id>http://drorata.github.io/</id><updated>2018-09-04T21:04:14+02:00</updated><entry><title>An attempt on smarter logging</title><link href="http://drorata.github.io/posts/2018/Sep/04/an-attempt-on-smarter-logging/" rel="alternate"></link><published>2018-09-04T20:55:10+02:00</published><updated>2018-09-04T21:04:14+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-09-04:/posts/2018/Sep/04/an-attempt-on-smarter-logging/</id><summary type="html">&lt;h2 id="motivation"&gt;Motivation&lt;/h2&gt;
 &lt;p&gt;Consider the case where you implement some logic somewhere, and this logic should be used from within several different places.
 Think of a logic and two apps using it.
-The logic should be yielding logging messages that would be visible as part of the runing of the different apps …&lt;/p&gt;</summary><content type="html">&lt;h2 id="motivation"&gt;Motivation&lt;/h2&gt;
+The logic should be yielding logging messages that would be visible as part of the running of the different apps …&lt;/p&gt;</summary><content type="html">&lt;h2 id="motivation"&gt;Motivation&lt;/h2&gt;
 &lt;p&gt;Consider the case where you implement some logic somewhere, and this logic should be used from within several different places.
 Think of a logic and two apps using it.
-The logic should be yielding logging messages that would be visible as part of the runing of the different apps.
+The logic should be yielding logging messages that would be visible as part of the running of the different apps.
 And here comes the additional requirement; the first app should use STDOUT for logging and the second should write the log messages to a file.
 Or, another possible requirement could be that the logging format should be different depending on the calling app.&lt;/p&gt;
 &lt;p&gt;In other words, the log messages yielded by the logic should merely be piped to one or more handlers managed by the calling app.
-In this example, you will see how I workaround this problem.
+In this example, you will see my workaround this problem.
 I hope you will find this solution helpful.
 Please comment if you have questions, suggestions etc.&lt;/p&gt;
 &lt;h2 id="the-solution"&gt;The solution&lt;/h2&gt;
@@ -37,7 +37,7 @@ Please comment if you have questions, suggestions etc.&lt;/p&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 
-&lt;p&gt;The key line here is the definition of the logger (line 5); it is associated to &lt;code&gt;__name__&lt;/code&gt;.
+&lt;p&gt;The key line here is the definition of the logger (line 5); it is associated with &lt;code&gt;__name__&lt;/code&gt;.
 This way, whatever &lt;code&gt;__name__&lt;/code&gt; might be, &lt;code&gt;logger&lt;/code&gt; will always be a child of the root logger.
 And this is the trick, namely, an app calling this logic should use the root logger.&lt;/p&gt;
 &lt;h3 id="the-first-app"&gt;The first app&lt;/h3&gt;
@@ -71,7 +71,7 @@ And this is the trick, namely, an app calling this logic should use the root log
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Note that here the &lt;code&gt;logger&lt;/code&gt; is the root one and we can defined the handler to be used.&lt;/p&gt;
+&lt;p&gt;Note that here the &lt;code&gt;logger&lt;/code&gt; is the root one and we can define the handler to be used.&lt;/p&gt;
 &lt;h3 id="the-second-app"&gt;The second app&lt;/h3&gt;
 &lt;p&gt;Similarly to the first one, the second should use the root logger as well.
 Check this out:&lt;/p&gt;
@@ -1075,10 +1075,10 @@ The synthetic&lt;/p&gt;
 
  
  
-&lt;div id="3dd4e500-7ca8-44d1-8546-0729a6de6c80"&gt;&lt;/div&gt;
+&lt;div id="fb33b164-99a3-4513-9613-c92976cfa0b0"&gt;&lt;/div&gt;
 &lt;div class="output_subarea output_widget_view "&gt;
 &lt;script type="text/javascript"&gt;
-var element = $('#3dd4e500-7ca8-44d1-8546-0729a6de6c80');
+var element = $('#fb33b164-99a3-4513-9613-c92976cfa0b0');
 &lt;/script&gt;
 &lt;script type="application/vnd.jupyter.widget-view+json"&gt;
 {"model_id": "fb25d76fed4949658247726a8220da02", "version_major": 2, "version_minor": 0}

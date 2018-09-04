@@ -11820,7 +11820,7 @@ jQuery(document).ready(function($) {
   <link rel="stylesheet" href="http://drorata.github.io/theme/css/style.css">
 
 
-<meta name="description" content="Motivation Consider the case where you implement some logic somewhere, and this logic should be used from within several different places. Think of a logic and two apps using it. The logic should be yielding logging messages that would be visible as part of the runing of the different apps …">
+<meta name="description" content="Motivation Consider the case where you implement some logic somewhere, and this logic should be used from within several different places. Think of a logic and two apps using it. The logic should be yielding logging messages that would be visible as part of the running of the different apps …">
 <script>
   (function(i, s, o, g, r, a, m) {
     i['GoogleAnalyticsObject'] = r;
@@ -11889,11 +11889,11 @@ jQuery(document).ready(function($) {
     <h2 id="motivation">Motivation</h2>
 <p>Consider the case where you implement some logic somewhere, and this logic should be used from within several different places.
 Think of a logic and two apps using it.
-The logic should be yielding logging messages that would be visible as part of the runing of the different apps.
+The logic should be yielding logging messages that would be visible as part of the running of the different apps.
 And here comes the additional requirement; the first app should use STDOUT for logging and the second should write the log messages to a file.
 Or, another possible requirement could be that the logging format should be different depending on the calling app.</p>
 <p>In other words, the log messages yielded by the logic should merely be piped to one or more handlers managed by the calling app.
-In this example, you will see how I workaround this problem.
+In this example, you will see my workaround this problem.
 I hope you will find this solution helpful.
 Please comment if you have questions, suggestions etc.</p>
 <h2 id="the-solution">The solution</h2>
@@ -11921,7 +11921,7 @@ Please comment if you have questions, suggestions etc.</p>
 </pre></div>
 </td></tr></table>
 
-<p>The key line here is the definition of the logger (line 5); it is associated to <code>__name__</code>.
+<p>The key line here is the definition of the logger (line 5); it is associated with <code>__name__</code>.
 This way, whatever <code>__name__</code> might be, <code>logger</code> will always be a child of the root logger.
 And this is the trick, namely, an app calling this logic should use the root logger.</p>
 <h3 id="the-first-app">The first app</h3>
@@ -11955,7 +11955,7 @@ And this is the trick, namely, an app calling this logic should use the root log
 </pre></div>
 
 
-<p>Note that here the <code>logger</code> is the root one and we can defined the handler to be used.</p>
+<p>Note that here the <code>logger</code> is the root one and we can define the handler to be used.</p>
 <h3 id="the-second-app">The second app</h3>
 <p>Similarly to the first one, the second should use the root logger as well.
 Check this out:</p>
