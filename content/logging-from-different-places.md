@@ -161,5 +161,8 @@ Secondly, note the different formatting of the messages.
 This is governed by the definitions in the apps and not all by the logic!
 By defining a different or additional handle, you could, for instance, write the log messages when using the second app to a [rotating file](https://docs.python.org/3/library/logging.handlers.html#logging.handlers.RotatingFileHandler).
 
+Lastly, thanks to [deeplook](https://github.com/deeplook) for his help :)
+
 That's it.
 Happy logging!
+
