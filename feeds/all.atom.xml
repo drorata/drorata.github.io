@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Dr. Dror</title><link href="http://drorata.github.io/" rel="alternate"></link><link href="http://drorata.github.io/feeds/all.atom.xml" rel="self"></link><id>http://drorata.github.io/</id><updated>2018-11-23T20:46:34+01:00</updated><entry><title>Custom Enums and tests</title><link href="http://drorata.github.io/posts/2018/Nov/23/custom-enums-and-tests/" rel="alternate"></link><published>2018-11-23T20:46:34+01:00</published><updated>2018-11-23T20:46:34+01:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-11-23:/posts/2018/Nov/23/custom-enums-and-tests/</id><summary type="html">&lt;p&gt;Somehow advanced usage of python's enums. Including a discussion on testing of those custom entities.&lt;/p&gt;</summary><content type="html">&lt;p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Dr. Dror</title><link href="http://drorata.github.io/" rel="alternate"></link><link href="http://drorata.github.io/feeds/all.atom.xml" rel="self"></link><id>http://drorata.github.io/</id><updated>2019-10-04T11:33:41+02:00</updated><subtitle>Foo is not just bar</subtitle><entry><title>Custom Enums and tests</title><link href="http://drorata.github.io/posts/2018/Nov/23/custom-enums-and-tests/" rel="alternate"></link><published>2018-11-23T20:46:34+01:00</published><updated>2018-11-23T20:46:34+01:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-11-23:/posts/2018/Nov/23/custom-enums-and-tests/</id><summary type="html">&lt;p&gt;Somehow advanced usage of python's enums. Including a discussion on testing of those custom entities.&lt;/p&gt;</summary><content type="html">&lt;p&gt;
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
@@ -861,7 +861,7 @@ Of course, you are likely to need way more, but I am sure this will serve as a g
 
 
 &lt;p&gt;If you want to see more details, this image is built using the sources available in &lt;a href="https://github.com/drorata/pm_api"&gt;this repository&lt;/a&gt;.
-You can create a local python environment, install the requirements and enjoy the example.&lt;/p&gt;</content><category term="python"></category><category term="docker"></category><category term="model"></category><category term="sklearn"></category><category term="IT"></category></entry><entry><title>Hedge Yourself From a Risky Data Science Job</title><link href="http://drorata.github.io/posts/2018/Mar/26/hedge-yourself-from-a-risky-data-science-job/" rel="alternate"></link><published>2018-03-26T19:57:17+02:00</published><updated>2018-03-27T06:53:14+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-03-26:/posts/2018/Mar/26/hedge-yourself-from-a-risky-data-science-job/</id><summary type="html">&lt;p&gt;I recently came across a wonderful post by Talia Borodin titled &lt;a href="https://www.entrepreneur.com/article/310505"&gt;"Think Your Company Needs a Data Scientist? You're Probably Wrong"&lt;/a&gt;.
+You can create a local python environment, install the requirements and enjoy the example.&lt;/p&gt;</content><category term="python"></category><category term="docker"></category><category term="model"></category><category term="sklearn"></category><category term="IT"></category></entry><entry><title>Hedge Yourself From a Risky Data Science Job</title><link href="http://drorata.github.io/posts/2018/Mar/26/hedge-yourself-from-a-risky-data-science-job/" rel="alternate"></link><published>2018-03-26T19:57:17+02:00</published><updated>2019-10-04T11:29:55+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2018-03-26:/posts/2018/Mar/26/hedge-yourself-from-a-risky-data-science-job/</id><summary type="html">&lt;p&gt;I recently came across a wonderful post by Talia Borodin titled &lt;a href="https://www.entrepreneur.com/article/310505"&gt;"Think Your Company Needs a Data Scientist? You're Probably Wrong"&lt;/a&gt;.
 If you didn't ready it yet, make sure you do it!
 It contains a wonderful collection of truths that every individual who has anything to do with data science …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I recently came across a wonderful post by Talia Borodin titled &lt;a href="https://www.entrepreneur.com/article/310505"&gt;"Think Your Company Needs a Data Scientist? You're Probably Wrong"&lt;/a&gt;.
 If you didn't ready it yet, make sure you do it!
@@ -1652,10 +1652,10 @@ The synthetic&lt;/p&gt;
 
  
  
-&lt;div id="0a3f88b3-d930-4948-8691-1a7224e03648"&gt;&lt;/div&gt;
+&lt;div id="3219ed95-cf5e-450f-ab1b-cdd6b24403fa"&gt;&lt;/div&gt;
 &lt;div class="output_subarea output_widget_view "&gt;
 &lt;script type="text/javascript"&gt;
-var element = $('#0a3f88b3-d930-4948-8691-1a7224e03648');
+var element = $('#3219ed95-cf5e-450f-ab1b-cdd6b24403fa');
 &lt;/script&gt;
 &lt;script type="application/vnd.jupyter.widget-view+json"&gt;
 {"model_id": "fb25d76fed4949658247726a8220da02", "version_major": 2, "version_minor": 0}
@@ -2081,7 +2081,7 @@ In this tutorial/post we shall discuss how to take a local code doing grid searc
 
 
 &lt;p&gt;If you'd try it out, you will find that each yields a different order in the generated tuple for each group.
-This should not come as a surprise, but one &lt;em&gt;should&lt;/em&gt; be aware of it!&lt;/p&gt;</content><category term="python"></category><category term="pandas"></category></entry><entry><title>Messages taken home from "AI in Data Science presented by RecdoTech"</title><link href="http://drorata.github.io/posts/2017/Sep/22/messages-taken-home-from-ai-in-data-science-presented-by-recdotech/" rel="alternate"></link><published>2017-09-22T21:55:48+02:00</published><updated>2017-09-22T22:00:05+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-09-22:/posts/2017/Sep/22/messages-taken-home-from-ai-in-data-science-presented-by-recdotech/</id><summary type="html">&lt;p&gt;Some remarks and highlights from taken from a meetup I attended.&lt;/p&gt;</summary><content type="html">&lt;p&gt;On September 14th (2017) I attended the first meet organized by RecdoTech&lt;sup id="fnref-b5d84a8f"&gt;&lt;a class="footnote-ref" href="#fn-b5d84a8f"&gt;2&lt;/a&gt;&lt;/sup&gt;.
+This should not come as a surprise, but one &lt;em&gt;should&lt;/em&gt; be aware of it!&lt;/p&gt;</content><category term="python"></category><category term="pandas"></category></entry><entry><title>Messages taken home from "AI in Data Science presented by RecdoTech"</title><link href="http://drorata.github.io/posts/2017/Sep/22/messages-taken-home-from-ai-in-data-science-presented-by-recdotech/" rel="alternate"></link><published>2017-09-22T21:55:48+02:00</published><updated>2019-10-04T11:30:58+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-09-22:/posts/2017/Sep/22/messages-taken-home-from-ai-in-data-science-presented-by-recdotech/</id><summary type="html">&lt;p&gt;Some remarks and highlights from taken from a meetup I attended.&lt;/p&gt;</summary><content type="html">&lt;p&gt;On September 14th (2017) I attended the first meet organized by RecdoTech&lt;sup id="fnref:b5d84a8f"&gt;&lt;a class="footnote-ref" href="#fn:b5d84a8f"&gt;2&lt;/a&gt;&lt;/sup&gt;.
 Although organized by be a recruitment agency, it turned out to be a real meetup.
 There should have been three talks, but eventually there were only two.&lt;/p&gt;
 &lt;p&gt;The first talk, by &lt;a href="https://www.linkedin.com/in/luba-weissmann-47b7757/"&gt;Luba Weissmann&lt;/a&gt;, introduce the basics concepts and ideas from the world of credit scoring.
@@ -2089,7 +2089,7 @@ In particular, Luba discussed how FinTech harnesses data science to understand b
 The speaker tried to make a very clear distinction between &lt;em&gt;machine learning&lt;/em&gt; and &lt;em&gt;AI&lt;/em&gt;; for her the main differentiator is the way the decision is made.
 Personally, I was not convinced, and I think primary reason to use the term AI in this context, is to create more hype.
 It is often the case, that AI is considered an umbrella of different automated decision making approaches.
-Many of them are employing machine learning, but not only.&lt;sup id="fnref-5fa6e1e7"&gt;&lt;a class="footnote-ref" href="#fn-5fa6e1e7"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+Many of them are employing machine learning, but not only.&lt;sup id="fnref:5fa6e1e7"&gt;&lt;a class="footnote-ref" href="#fn:5fa6e1e7"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 &lt;p&gt;An interesting point raised by Luba is that regulators are introducing hurdles to the integration of AI (in the broader sense) into credit scoring.
 The reason might be a little surprising: in a nutshell, when credit is denied, the customer (let it be an individual or a company) has the right to know why the rejection happened.
 However, assuming the reason for rejection is due to an algorithm which returned some value, it is not necessarily clear and trivial to explain why and in turn it may be hard to explain this to the customer.
@@ -2113,7 +2113,7 @@ Sometimes, the overhead derived by big data is so much bigger, that at the end o
 The most important key to &lt;em&gt;smart data&lt;/em&gt; is to have it labeled or flagged.
 This is the only way that the data scientist can really derive insights out of it.
 Facebook, Google, Airbnb and all the others are releasing technologies like crazy.
-They are much more cautious when it comes to sharing labeled data&lt;sup id="fnref-9f4e79c9"&gt;&lt;a class="footnote-ref" href="#fn-9f4e79c9"&gt;3&lt;/a&gt;&lt;/sup&gt;.
+They are much more cautious when it comes to sharing labeled data&lt;sup id="fnref:9f4e79c9"&gt;&lt;a class="footnote-ref" href="#fn:9f4e79c9"&gt;3&lt;/a&gt;&lt;/sup&gt;.
 Companies are trying to improve their data quality all the time and user feedback is a central ingredient.
 For instance, think of all the thumbs-up/down icons that turned into a little epidemic.
 They are all there as part of the effort of companies to label, tag and flag their data.&lt;/p&gt;
@@ -2132,14 +2132,14 @@ I believe that during an initial phase of integration of the team(s) in the orga
 &lt;div class="footnote"&gt;
 &lt;hr&gt;
 &lt;ol&gt;
-&lt;li id="fn-5fa6e1e7"&gt;
-&lt;p&gt;Nice summary on &lt;a href="https://www.quora.com/What-are-the-main-differences-between-artificial-intelligence-and-machine-learning-Is-machine-learning-a-part-of-artificial-intelligence"&gt;Quora&lt;/a&gt;&amp;#160;&lt;a class="footnote-backref" href="#fnref-5fa6e1e7" title="Jump back to footnote 1 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;li id="fn:5fa6e1e7"&gt;
+&lt;p&gt;Nice summary on &lt;a href="https://www.quora.com/What-are-the-main-differences-between-artificial-intelligence-and-machine-learning-Is-machine-learning-a-part-of-artificial-intelligence"&gt;Quora&lt;/a&gt;&amp;#160;&lt;a class="footnote-backref" href="#fnref:5fa6e1e7" title="Jump back to footnote 1 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li id="fn-b5d84a8f"&gt;
-&lt;p&gt;This is a brand of Darwin Recruitment. See &lt;a href="https://www.meetup.com/RecdoTech/members/230799589/"&gt;profile&lt;/a&gt;&amp;#160;&lt;a class="footnote-backref" href="#fnref-b5d84a8f" title="Jump back to footnote 2 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;li id="fn:b5d84a8f"&gt;
+&lt;p&gt;This is a brand of Darwin Recruitment. See &lt;a href="https://www.meetup.com/RecdoTech/members/230799589/"&gt;profile&lt;/a&gt;&amp;#160;&lt;a class="footnote-backref" href="#fnref:b5d84a8f" title="Jump back to footnote 2 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li id="fn-9f4e79c9"&gt;
-&lt;p&gt;There are &lt;a href="https://quickdraw.withgoogle.com/data"&gt;exceptions&lt;/a&gt; of course.&amp;#160;&lt;a class="footnote-backref" href="#fnref-9f4e79c9" title="Jump back to footnote 3 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;li id="fn:9f4e79c9"&gt;
+&lt;p&gt;There are &lt;a href="https://quickdraw.withgoogle.com/data"&gt;exceptions&lt;/a&gt; of course.&amp;#160;&lt;a class="footnote-backref" href="#fnref:9f4e79c9" title="Jump back to footnote 3 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;</content></entry><entry><title>Why do we need to divide by n-1?</title><link href="http://drorata.github.io/posts/2017/Sep/10/why-do-we-need-to-divide-by-n-1/" rel="alternate"></link><published>2017-09-10T18:13:07+02:00</published><updated>2017-09-10T18:13:07+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-09-10:/posts/2017/Sep/10/why-do-we-need-to-divide-by-n-1/</id><summary type="html">&lt;p&gt;Trying to give an intuitive understanding what's the difference between a biased and unbiased estimators of variance of a sample.&lt;/p&gt;</summary><content type="html">&lt;p&gt;
@@ -5140,11 +5140,14 @@ I didn't find a way around it yet albeit I'm sure there must be one; after all S
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -5158,6 +5161,8 @@ I didn't find a way around it yet albeit I'm sure there must be one; after all S
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
         "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
@@ -5178,6 +5183,8 @@ I didn't find a way around it yet albeit I'm sure there must be one; after all S
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 &lt;/script&gt;</content><category term="SQL"></category><category term="atom"></category><category term="python"></category><category term="mac"></category></entry><entry><title>Running Visdom examples within a Docker container</title><link href="http://drorata.github.io/posts/2017/Apr/04/running-visdom-examples-within-a-docker-container/" rel="alternate"></link><published>2017-04-04T20:45:45+02:00</published><updated>2017-04-04T20:53:38+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-04-04:/posts/2017/Apr/04/running-visdom-examples-within-a-docker-container/</id><summary type="html">&lt;p&gt;Docker could be a great tool when you want to try out new technologies without taking the risk of breaking your own system.
@@ -5246,7 +5253,7 @@ One of my central motivations is to utilize this technology for the creation of 
 The first minimal working example I came up with contains a notebook which loads the data from a CSV file which is part of the image.
 You can see the details &lt;a href="https://github.com/drorata/mwe-jupyter-docker"&gt;here&lt;/a&gt;.
 While preparing this image, I came across many useful items; I collected some of them in this post.&lt;/p&gt;
-&lt;h2 id="connecting-two-containers-over-network-1"&gt;Connecting two containers over network &lt;sup id="fnref-7e76b2d7"&gt;&lt;a class="footnote-ref" href="#fn-7e76b2d7"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/h2&gt;
+&lt;h2 id="connecting-two-containers-over-network-1"&gt;Connecting two containers over network &lt;sup id="fnref:7e76b2d7"&gt;&lt;a class="footnote-ref" href="#fn:7e76b2d7"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/h2&gt;
 &lt;p&gt;First, start a new network:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;docker network create new-network
 &lt;/pre&gt;&lt;/div&gt;
@@ -5258,7 +5265,7 @@ docker run -i -t --name cont2 --net&lt;span class="o"&gt;=&lt;/span&gt;new-netwo
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;h2 id="stop-remove-all-running-containers-2"&gt;Stop / Remove all running containers &lt;sup id="fnref-15cde0e3"&gt;&lt;a class="footnote-ref" href="#fn-15cde0e3"&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/h2&gt;
+&lt;h2 id="stop-remove-all-running-containers-2"&gt;Stop / Remove all running containers &lt;sup id="fnref:15cde0e3"&gt;&lt;a class="footnote-ref" href="#fn:15cde0e3"&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;docker stop &lt;span class="k"&gt;$(&lt;/span&gt;docker ps -a -q&lt;span class="k"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -5323,7 +5330,7 @@ Lastly, putting everything together, you can instantiate a new container as foll
 &lt;li&gt;&lt;a href="https://docs.docker.com/engine/tutorials/dockervolumes/#mount-a-host-directory-as-a-data-volume"&gt;Mounting local directory&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://www.continuum.io/blog/developer-blog/anaconda-and-docker-better-together-reproducible-data-science"&gt;Running notebook from a container&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id="location-of-images-3"&gt;Location of images &lt;sup id="fnref-167a330e"&gt;&lt;a class="footnote-ref" href="#fn-167a330e"&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/h2&gt;
+&lt;h2 id="location-of-images-3"&gt;Location of images &lt;sup id="fnref:167a330e"&gt;&lt;a class="footnote-ref" href="#fn:167a330e"&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/h2&gt;
 &lt;p&gt;On Mac images are stored in a file&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/Docker.qcow2
 &lt;/pre&gt;&lt;/div&gt;
@@ -5340,14 +5347,14 @@ Simply run:&lt;/p&gt;
 &lt;div class="footnote"&gt;
 &lt;hr&gt;
 &lt;ol&gt;
-&lt;li id="fn-7e76b2d7"&gt;
-&lt;p&gt;&lt;a href="http://stackoverflow.com/questions/25324860/how-to-create-a-bidirectional-link-between-containers/35577068#35577068"&gt;source&lt;/a&gt;&amp;#160;&lt;a class="footnote-backref" href="#fnref-7e76b2d7" title="Jump back to footnote 1 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;li id="fn:7e76b2d7"&gt;
+&lt;p&gt;&lt;a href="http://stackoverflow.com/questions/25324860/how-to-create-a-bidirectional-link-between-containers/35577068#35577068"&gt;source&lt;/a&gt;&amp;#160;&lt;a class="footnote-backref" href="#fnref:7e76b2d7" title="Jump back to footnote 1 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li id="fn-15cde0e3"&gt;
-&lt;p&gt;&lt;a href="https://coderwall.com/p/ewk0mq/stop-remove-all-docker-containers"&gt;source&lt;/a&gt;&amp;#160;&lt;a class="footnote-backref" href="#fnref-15cde0e3" title="Jump back to footnote 2 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;li id="fn:15cde0e3"&gt;
+&lt;p&gt;&lt;a href="https://coderwall.com/p/ewk0mq/stop-remove-all-docker-containers"&gt;source&lt;/a&gt;&amp;#160;&lt;a class="footnote-backref" href="#fnref:15cde0e3" title="Jump back to footnote 2 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li id="fn-167a330e"&gt;
-&lt;p&gt;&lt;a href="https://forums.docker.com/t/where-are-images-stored-on-mac-os-x/17165/2"&gt;source&lt;/a&gt;&amp;#160;&lt;a class="footnote-backref" href="#fnref-167a330e" title="Jump back to footnote 3 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;li id="fn:167a330e"&gt;
+&lt;p&gt;&lt;a href="https://forums.docker.com/t/where-are-images-stored-on-mac-os-x/17165/2"&gt;source&lt;/a&gt;&amp;#160;&lt;a class="footnote-backref" href="#fnref:167a330e" title="Jump back to footnote 3 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;</content><category term="docker"></category><category term="reproducible"></category><category term="research"></category><category term="jupyter"></category></entry><entry><title>Mushrooms and decision trees</title><link href="http://drorata.github.io/posts/2017/Mar/31/mushrooms-and-decision-trees/" rel="alternate"></link><published>2017-03-31T11:16:12+02:00</published><updated>2018-02-20T21:24:29+01:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-03-31:/posts/2017/Mar/31/mushrooms-and-decision-trees/</id><summary type="html">&lt;p&gt;Playing around with decision trees on a dataset of mushrooms&lt;/p&gt;</summary><content type="html">&lt;h2 id="preface"&gt;Preface&lt;/h2&gt;
@@ -20121,10 +20128,10 @@ If you decide to do so, the risk is all yours!&lt;/p&gt;
 &lt;/div&gt;
  
 
-&lt;/p&gt;</content><category term="decision"></category><category term="trees"></category><category term="python"></category></entry><entry><title>Remarks on "Data Driven" by Patil &amp; Mason</title><link href="http://drorata.github.io/posts/2017/Mar/20/remarks-on-data-driven-by-patil-mason/" rel="alternate"></link><published>2017-03-20T09:08:14+01:00</published><updated>2017-03-20T09:08:14+01:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-03-20:/posts/2017/Mar/20/remarks-on-data-driven-by-patil-mason/</id><summary type="html">&lt;p&gt;Some remarks, comments and ideas discussed after reading the paper "Data Driven - creating a data culture"&lt;/p&gt;</summary><content type="html">&lt;p&gt;I read recently the paper &lt;em&gt;"Data Driven - creating a data culture"&lt;/em&gt; by DJ Patil and Hilary Mason (&lt;a href="http://www.oreilly.com/data/free/data-driven.csp"&gt;link&lt;/a&gt;).
+&lt;/p&gt;</content><category term="decision"></category><category term="trees"></category><category term="python"></category></entry><entry><title>Remarks on "Data Driven" by Patil &amp; Mason</title><link href="http://drorata.github.io/posts/2017/Mar/20/remarks-on-data-driven-by-patil-mason/" rel="alternate"></link><published>2017-03-20T09:08:14+01:00</published><updated>2019-10-04T11:32:53+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-03-20:/posts/2017/Mar/20/remarks-on-data-driven-by-patil-mason/</id><summary type="html">&lt;p&gt;Some remarks, comments and ideas discussed after reading the paper "Data Driven - creating a data culture"&lt;/p&gt;</summary><content type="html">&lt;p&gt;I read recently the paper &lt;em&gt;"Data Driven - creating a data culture"&lt;/em&gt; by DJ Patil and Hilary Mason (&lt;a href="http://www.oreilly.com/data/free/data-driven.csp"&gt;link&lt;/a&gt;).
 In this post, I'd like to share some thoughts/remarks/etc. that I collected while reading.&lt;/p&gt;
 &lt;h2 id="communication-skills"&gt;Communication skills&lt;/h2&gt;
-&lt;p&gt;Rather early on the authors mention the importance of &lt;a href="http://drorata.github.io/posts/2017/Feb/17/thoughts-about-data-science-teams/"&gt;communication skills&lt;/a&gt;.
+&lt;p&gt;Rather early on the authors mention the importance of &lt;a href="http://drorata.github.io/thoughts-about-ds.md"&gt;communication skills&lt;/a&gt;.
 For "Asking the right questions" one need to be able to communicate with different stakeholders.
 As a data science team, you need to understand what are the pain points of your colleagues and to that end you would have to speak with them.
 You could have Spock, Lieutenant Data, Pinky and the Brain on board but if they can only talk to each other things won't move forward.&lt;/p&gt;
@@ -20176,7 +20183,7 @@ Despite of the comments above, still keep in mind that a stupid question is one 
 &lt;p&gt;The output of software development is naturally a software.
 However, when a software developer presents his or her work the compiled binaries are not the whole story.
 It is important to present also the source code, which has to be readable, meet the coding conventions of the team, testable, etc. etc.
-As software engineering dates back to the 60s of the previous century&lt;sup id="fnref-7d3740b4"&gt;&lt;a class="footnote-ref" href="#fn-7d3740b4"&gt;1&lt;/a&gt;&lt;/sup&gt; the industry has well established methods, paradigms and processes that enable successful software development.
+As software engineering dates back to the 60s of the previous century&lt;sup id="fnref:7d3740b4"&gt;&lt;a class="footnote-ref" href="#fn:7d3740b4"&gt;1&lt;/a&gt;&lt;/sup&gt; the industry has well established methods, paradigms and processes that enable successful software development.
 Reproducible work in the context of software development means that the binaries can be recompiled by someone who is not the original developer.&lt;/p&gt;
 &lt;p&gt;However, in the context of output of data science work, reproducibility depends on slightly different set of elements:&lt;/p&gt;
 &lt;ol&gt;
@@ -20224,8 +20231,8 @@ Still, the size of the resulting image might be a hurdle when it comes to easily
 &lt;div class="footnote"&gt;
 &lt;hr&gt;
 &lt;ol&gt;
-&lt;li id="fn-7d3740b4"&gt;
-&lt;p&gt;Paul Niquette (1995). &lt;a href="http://www.niquette.com/books/softword/tocsoft.html"&gt;"Softword: Provenance for the Word 'Software'"&lt;/a&gt;. adapted from Sophisticated: The Magazine ISBN 1-58922-233-4&amp;#160;&lt;a class="footnote-backref" href="#fnref-7d3740b4" title="Jump back to footnote 1 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;li id="fn:7d3740b4"&gt;
+&lt;p&gt;Paul Niquette (1995). &lt;a href="http://www.niquette.com/books/softword/tocsoft.html"&gt;"Softword: Provenance for the Word 'Software'"&lt;/a&gt;. adapted from Sophisticated: The Magazine ISBN 1-58922-233-4&amp;#160;&lt;a class="footnote-backref" href="#fnref:7d3740b4" title="Jump back to footnote 1 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;</content><category term="docker"></category><category term="jupyter"></category><category term="reproducible"></category><category term="research"></category></entry><entry><title>Setting new computer</title><link href="http://drorata.github.io/posts/2017/Mar/10/setting-new-computer/" rel="alternate"></link><published>2017-03-10T11:24:46+01:00</published><updated>2017-04-04T07:26:29+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-03-10:/posts/2017/Mar/10/setting-new-computer/</id><summary type="html">&lt;p&gt;Mostly notes for myself on what items I installed on a new machine. You might be interested as well.&lt;/p&gt;</summary><content type="html">&lt;h1 id="straightforward"&gt;Straightforward&lt;/h1&gt;
@@ -21832,7 +21839,7 @@ In the future I will explain this in details.&lt;/p&gt;
 &lt;/div&gt;
  
 
-&lt;/p&gt;</content><category term="linear"></category><category term="regression"></category><category term="model"></category><category term="example"></category></entry><entry><title>Thoughts about data science teams</title><link href="http://drorata.github.io/posts/2017/Feb/17/thoughts-about-data-science-teams/" rel="alternate"></link><published>2017-02-17T15:03:58+01:00</published><updated>2017-02-19T21:59:45+01:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-02-17:/posts/2017/Feb/17/thoughts-about-data-science-teams/</id><summary type="html">&lt;p&gt;Some thoughts about the traits needed to establish a successful data science team.&lt;/p&gt;</summary><content type="html">&lt;p&gt;One of the positive things about my current situation (read job hunting), is that it provides a good excuse to meet many different people from many different domains.
+&lt;/p&gt;</content><category term="linear"></category><category term="regression"></category><category term="model"></category><category term="example"></category></entry><entry><title>Thoughts about data science teams</title><link href="http://drorata.github.io/posts/2017/Feb/17/thoughts-about-data-science-teams/" rel="alternate"></link><published>2017-02-17T15:03:58+01:00</published><updated>2019-10-04T11:33:24+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-02-17:/posts/2017/Feb/17/thoughts-about-data-science-teams/</id><summary type="html">&lt;p&gt;Some thoughts about the traits needed to establish a successful data science team.&lt;/p&gt;</summary><content type="html">&lt;p&gt;One of the positive things about my current situation (read job hunting), is that it provides a good excuse to meet many different people from many different domains.
 This is indeed the case for me.
 Furthermore, this state makes you think a lot about your domain, what is your position in it and so on.
 You know, the kind of &lt;em&gt;thoughts-about-life&lt;/em&gt; mode.&lt;/p&gt;
@@ -21944,11 +21951,14 @@ This way you will enable a focused efforts on the data front.&lt;/li&gt;
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -21962,6 +21972,8 @@ This way you will enable a focused efforts on the data front.&lt;/li&gt;
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
         "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
@@ -21982,6 +21994,8 @@ This way you will enable a focused efforts on the data front.&lt;/li&gt;
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 &lt;/script&gt;</content><category term="team"></category><category term="training"></category><category term="ace"></category></entry><entry><title>Parasitic numbers - did you know?</title><link href="http://drorata.github.io/posts/2017/Jan/30/parasitic-numbers-did-you-know/" rel="alternate"></link><published>2017-01-30T15:32:31+01:00</published><updated>2017-01-30T15:37:34+01:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-01-30:/posts/2017/Jan/30/parasitic-numbers-did-you-know/</id><summary type="html">&lt;p&gt;Just learned about a new kind of numbers&lt;/p&gt;</summary><content type="html">&lt;p&gt;
@@ -23847,7 +23861,7 @@ However, the bigger the sample, the more precises the test is; i.e. we correctly
 &lt;/div&gt;
  
 
-&lt;/p&gt;</content><category term="t-test"></category><category term="hypothesis"></category></entry><entry><title>My getting started with Atom</title><link href="http://drorata.github.io/posts/2017/Jan/20/my-getting-started-with-atom/" rel="alternate"></link><published>2017-01-20T09:29:24+01:00</published><updated>2017-01-20T20:25:11+01:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-01-20:/posts/2017/Jan/20/my-getting-started-with-atom/</id><summary type="html">&lt;h1 id="introduction"&gt;Introduction&lt;/h1&gt;
+&lt;/p&gt;</content><category term="t-test"></category><category term="hypothesis"></category></entry><entry><title>My getting started with Atom</title><link href="http://drorata.github.io/posts/2017/Jan/20/my-getting-started-with-atom/" rel="alternate"></link><published>2017-01-20T09:29:24+01:00</published><updated>2019-10-04T11:33:41+02:00</updated><author><name>Dror Atariah</name></author><id>tag:drorata.github.io,2017-01-20:/posts/2017/Jan/20/my-getting-started-with-atom/</id><summary type="html">&lt;h1 id="introduction"&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;I recently discovered Atom.
 In the past, I've been using Emacs but not so long ago I realized that it is time to move on.
 Sublime Text 3 was the next editor, but only for a short while.
@@ -24121,11 +24135,14 @@ And here's a displayed math &lt;/p&gt;
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -24139,6 +24156,8 @@ And here's a displayed math &lt;/p&gt;
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
         "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
@@ -24159,6 +24178,8 @@ And here's a displayed math &lt;/p&gt;
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 &lt;/script&gt;</content></entry></feed>

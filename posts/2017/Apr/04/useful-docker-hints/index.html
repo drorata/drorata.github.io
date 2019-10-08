@@ -11811,7 +11811,6 @@ jQuery(document).ready(function($) {
   <link rel="canonical" href="http://drorata.github.io/posts/2017/Apr/04/useful-docker-hints/index.html">
 
   <link rel="alternate" type="application/atom+xml" href="http://drorata.github.io/feeds/all.atom.xml" title="Full Atom Feed">
-  <link rel="alternate" type="application/atom+xml" href="http://drorata.github.io/feeds/howto.atom.xml" title="Categories Atom Feed">
 
 
   <link rel="stylesheet" href="http://drorata.github.io/theme/css/bootstrap.min.css">
@@ -11891,7 +11890,7 @@ One of my central motivations is to utilize this technology for the creation of 
 The first minimal working example I came up with contains a notebook which loads the data from a CSV file which is part of the image.
 You can see the details <a href="https://github.com/drorata/mwe-jupyter-docker">here</a>.
 While preparing this image, I came across many useful items; I collected some of them in this post.</p>
-<h2 id="connecting-two-containers-over-network-1">Connecting two containers over network <sup id="fnref-7e76b2d7"><a class="footnote-ref" href="#fn-7e76b2d7">1</a></sup></h2>
+<h2 id="connecting-two-containers-over-network-1">Connecting two containers over network <sup id="fnref:7e76b2d7"><a class="footnote-ref" href="#fn:7e76b2d7">1</a></sup></h2>
 <p>First, start a new network:</p>
 <div class="highlight"><pre><span></span>docker network create new-network
 </pre></div>
@@ -11903,7 +11902,7 @@ docker run -i -t --name cont2 --net<span class="o">=</span>new-network --net-ali
 </pre></div>
 
 
-<h2 id="stop-remove-all-running-containers-2">Stop / Remove all running containers <sup id="fnref-15cde0e3"><a class="footnote-ref" href="#fn-15cde0e3">2</a></sup></h2>
+<h2 id="stop-remove-all-running-containers-2">Stop / Remove all running containers <sup id="fnref:15cde0e3"><a class="footnote-ref" href="#fn:15cde0e3">2</a></sup></h2>
 <div class="highlight"><pre><span></span>docker stop <span class="k">$(</span>docker ps -a -q<span class="k">)</span>
 </pre></div>
 
@@ -11968,7 +11967,7 @@ Lastly, putting everything together, you can instantiate a new container as foll
 <li><a href="https://docs.docker.com/engine/tutorials/dockervolumes/#mount-a-host-directory-as-a-data-volume">Mounting local directory</a></li>
 <li><a href="https://www.continuum.io/blog/developer-blog/anaconda-and-docker-better-together-reproducible-data-science">Running notebook from a container</a></li>
 </ul>
-<h2 id="location-of-images-3">Location of images <sup id="fnref-167a330e"><a class="footnote-ref" href="#fn-167a330e">3</a></sup></h2>
+<h2 id="location-of-images-3">Location of images <sup id="fnref:167a330e"><a class="footnote-ref" href="#fn:167a330e">3</a></sup></h2>
 <p>On Mac images are stored in a file</p>
 <div class="highlight"><pre><span></span><span class="nv">$HOME</span>/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/Docker.qcow2
 </pre></div>
@@ -11985,14 +11984,14 @@ Simply run:</p>
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn-7e76b2d7">
-<p><a href="http://stackoverflow.com/questions/25324860/how-to-create-a-bidirectional-link-between-containers/35577068#35577068">source</a>&#160;<a class="footnote-backref" href="#fnref-7e76b2d7" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:7e76b2d7">
+<p><a href="http://stackoverflow.com/questions/25324860/how-to-create-a-bidirectional-link-between-containers/35577068#35577068">source</a>&#160;<a class="footnote-backref" href="#fnref:7e76b2d7" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn-15cde0e3">
-<p><a href="https://coderwall.com/p/ewk0mq/stop-remove-all-docker-containers">source</a>&#160;<a class="footnote-backref" href="#fnref-15cde0e3" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<li id="fn:15cde0e3">
+<p><a href="https://coderwall.com/p/ewk0mq/stop-remove-all-docker-containers">source</a>&#160;<a class="footnote-backref" href="#fnref:15cde0e3" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
-<li id="fn-167a330e">
-<p><a href="https://forums.docker.com/t/where-are-images-stored-on-mac-os-x/17165/2">source</a>&#160;<a class="footnote-backref" href="#fnref-167a330e" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<li id="fn:167a330e">
+<p><a href="https://forums.docker.com/t/where-are-images-stored-on-mac-os-x/17165/2">source</a>&#160;<a class="footnote-backref" href="#fnref:167a330e" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
