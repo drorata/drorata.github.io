@@ -1,6 +1,8 @@
 Title: CV
 Status: published
 ## Dr. Dror Atariah
+(_Most updated on [LI](https://www.linkedin.com/in/atariah)_)
+
 []() `drorata @ gmail.com` `+49 (176) 202 80 996`
 
 Data Science - Python - Hadoop - Elasticsearch
