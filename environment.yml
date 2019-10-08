@@ -10,5 +10,5 @@ dependencies:
   - nb_conda
   - ghp-import
   - pip:
-    - pelican==3.7.1
+    - pelican>3.7.1
     - gitpython

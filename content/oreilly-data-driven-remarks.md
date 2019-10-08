@@ -10,12 +10,12 @@ In this post, I'd like to share some thoughts/remarks/etc. that I collected whil
 
 ## Communication skills
 
-Rather early on the authors mention the importance of [communication skills]({filename}thoughts-about-ds.md).
+Rather early on the authors mention the importance of [communication skills]({static}thoughts-about-ds.md).
 For "Asking the right questions" one need to be able to communicate with different stakeholders.
 As a data science team, you need to understand what are the pain points of your colleagues and to that end you would have to speak with them.
 You could have Spock, Lieutenant Data, Pinky and the Brain on board but if they can only talk to each other things won't move forward.
 
-![Date heroes]({filename}/images/data-characters.jpg)
+![Date heroes]({static}/images/data-characters.jpg)
 
 ## Data democratization
 

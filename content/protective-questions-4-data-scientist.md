@@ -9,7 +9,7 @@ Talia's post is aiming at the entrepreneurs and other managing functions in comp
 However, the discussed messages and questions can, and should, be pivoted, thus becoming a valuable tool in the hands of data science professionals themselves.
 A data scientist who is hired by a company which doesn't manage to answer all four questions properly, is entering a world of pain.
 
-![world_of_pain]({filename}/images/world_of_pain.jpg)
+![world_of_pain]({static}/images/world_of_pain.jpg)
 [[Source]](http://www.quickmeme.com/meme/3rrcmo/page/1/)
 
 ## How much data is available?

@@ -11,7 +11,7 @@ This is indeed the case for me.
 Furthermore, this state makes you think a lot about your domain, what is your position in it and so on.
 You know, the kind of *thoughts-about-life* mode.
 
-<center>![thought-about-life]({filename}/images/life-data-thoughts.jpg)</center>
+<center>![thought-about-life]({static}/images/life-data-thoughts.jpg)</center>
 
 # What is a data scientist?
 

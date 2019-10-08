@@ -27,7 +27,7 @@ The second talk, by [Sébastien Foucaud](https://www.linkedin.com/in/sfoucaud/),
 In the business world, the results of data science work have to have impact.
 The needle has to move!
 
-![VU meter]({filename}/images/VU_Meter.gif)
+![VU meter]({static}/images/VU_Meter.gif)
 
 The data scientist who wishes to survive and strive in the business world, has to add value to the operations.
 Even research labs ran by big players are, at the end of the day, about adding value to the company.
@@ -50,7 +50,7 @@ Companies are trying to improve their data quality all the time and user feedbac
 For instance, think of all the thumbs-up/down icons that turned into a little epidemic.
 They are all there as part of the effort of companies to label, tag and flag their data.
 
-![Thumbs up]({filename}/images/thumbs-up.jpg)
+![Thumbs up]({static}/images/thumbs-up.jpg)
 
 [^9f4e79c9]: There are [exceptions](https://quickdraw.withgoogle.com/data) of course.
 
