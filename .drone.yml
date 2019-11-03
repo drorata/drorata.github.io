@@ -1,0 +1,18 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: getting-started
+    image: alpine:3.10
+    commands:
+      - ls
+    when:
+      event: push
+  - name: build-static-pages
+    image: drorata/pelican-docker-build:latest
+    environment:
+      CONTENT_DIR: content
+      OUTPUT_DIR: output
+      CONFIG_NAME: publishconf.py
