@@ -4,10 +4,14 @@ type: docker
 name: default
 
 steps:
-  - name: getting-started
-    image: alpine:3.10
+  - name: prep-submodules
+    image: alpine/git
     commands:
+      - echo "Updating deps (git submodules)"
       - ls
+      - git submodule init
+      - git submodule update
+      - ls themes/
     when:
       event: push
   - name: build-static-pages
