@@ -6,9 +6,12 @@ dependencies:
   - numpy
   - pandas
   - markdown
-  - jupyter
-  - nb_conda
+  # - nb_conda
   - ghp-import
   - pip:
-    - pelican>3.7.1
-    - gitpython
+      - pelican==3.7.1
+      - mistune==0.8.4
+      - nbconvert==5.4.0
+      - ipython==7.0.0
+      - gitpython
+      # - jupyter==5.6.0
