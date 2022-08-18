@@ -54,8 +54,6 @@ EXTRA_PATH_METADATA = {
     'extra/keybase.txt': {'path': 'keybase.txt'}
 }
 
-PLUGIN_PATHS = ["plugins"]
-PLUGINS = ["render_math", "liquid_tags.notebook", "filetime_from_git"]
 MARKDOWN = {
     'extension_configs': {
         'markdown.extensions.codehilite': {'css_class': 'highlight'},
