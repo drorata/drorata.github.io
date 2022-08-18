@@ -1,5 +1,6 @@
 Title: Messages taken home from "AI in Data Science presented by RecdoTech"
 Status: published
+Date: 2017-09-20
 Category: DS
 Summary: Some remarks and highlights from taken from a meetup I attended.
 
