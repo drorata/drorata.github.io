@@ -65,7 +65,7 @@ THEME = "themes/pelican-alchemy/alchemy"
 SITEIMAGE = "/images/colored-spiral-of-roots.png width=90 height=90"
 
 DISQUS_SITENAME = "dr-dror"
-GOOGLE_ANALYTICS = "UA-107048491-1"
+GOOGLE_ANALYTICS = "G-WH47T9F1TR"
 
 # SEARCH_BOX = True
 HIDE_AUTHORS = True
