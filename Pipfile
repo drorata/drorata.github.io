@@ -7,6 +7,7 @@ name = "pypi"
 pandas = "==1.3.5"
 numpy = "==1.21.6"
 markdown = "==3.4.1"
+# TODO: pin a version
 ghp-import = "*"
 pelican = "==4.8.0"
 mistune = "==0.8.4"
