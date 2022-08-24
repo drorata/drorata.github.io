@@ -10,7 +10,7 @@ markdown = "==3.4.1"
 # TODO: pin a version
 ghp-import = "*"
 pelican = "==4.8.0"
-mistune = "==2.0.3"
+mistune = "==0.8.4"
 gitpython = "*"
 jinja2 = "==3.0"
 pelican-render-math = "==1.0.3"
