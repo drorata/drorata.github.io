@@ -4,3 +4,4 @@ output/
 content/notebooks/.ipynb_checkpoints/
 _nb_header.html
 .vscode
+Pipfile.lock
