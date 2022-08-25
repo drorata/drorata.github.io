@@ -1,0 +1,30 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  serve:
+    cmds:
+      - pelican --listen
+
+  dev:
+    cmds:
+      - rm -rf "./output/*"
+      - pelican -r "./content/" -o "./output/" -s "./pelicanconf.py"
+
+  build:
+    cmds:
+      - echo "Remove existing output"
+      - rm -rf "./output/*"
+      - echo "Building new output"
+      - pelican "./content/" -o "./output/" -s "./pelicanconf.py"
+    silent: true
+
+  publish:
+    deps: [build]
+    cmds:
+      - ghp-import output
+      - git push git@github.com:drorata/drorata.github.io.git gh-pages:master
