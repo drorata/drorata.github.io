@@ -28,7 +28,9 @@ Status: published
 
 Here's one of the highlights of my academic past:
 
-<iframe width="400" height="255" src="http://www.youtube.com/embed/SBFwgR4K1Gk?rel=0" frameborder="0" allowfullscreen> </iframe>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/SBFwgR4K1Gk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
 This video visualizes the contact surfaces in the configuration space of a triangular robot which translates and rotates amid planar polygons.
 It illustrates the various possible contacts and their three-dimensional representation.
