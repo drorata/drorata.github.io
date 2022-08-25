@@ -21,9 +21,14 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-LINKS = (
-    ("LinkedIn", "https://www.linkedin.com/in/atariah"),
-    # ('You can modify those links in your config file', '#'),
+# LINKS = (
+#     ("LinkedIn", "https://www.linkedin.com/in/atariah"),
+#     ("GitHub", "http://github.com/drorata/"),
+# )
+ICONS = (
+    ("github", "https://github.com/drorata"),
+    ("linkedin", "https://www.linkedin.com/in/atariah"),
+    # ("fas fa-envelope", "mailto:drorata@gmail.com"),
 )
 
 # Social widget
