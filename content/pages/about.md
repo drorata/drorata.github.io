@@ -9,6 +9,7 @@ Status: published
 - Editor of choice: ![VS Code]({static}/images/vscode_icon.png)
 - Checkout my [LinkedIn](https://www.linkedin.com/in/atariah/) for more details.
 - Wanna contact me? [`drorata@gmail.com`](mailto:drorata@gmail.com)
+- [Zen of Dror <i class="fas fa-user-graduate"></i>](https://docs.google.com/document/d/1Z_iM7D4oQDOOy1Ivizt7jAJPEZw4meunGlsQ5yz7EJM/edit?usp=sharing)
 
 ## Fields of interest
 
