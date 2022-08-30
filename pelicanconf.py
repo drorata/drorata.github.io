@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 AUTHOR = "Dror Atariah"
 SITENAME = "Dr. Dror"
-SITESUBTITLE = "Foo is not just bar"
+SITESUBTITLE = 'Foo is not just a "Bar"'
 SITEURL = "https://drorata.github.io"
 
 PATH = "content"
