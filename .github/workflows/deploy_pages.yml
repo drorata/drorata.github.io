@@ -18,3 +18,5 @@ jobs:
       - name: Install dependencies
         run: |
           pipenv install
+      - name: Build pages
+        run: task build
