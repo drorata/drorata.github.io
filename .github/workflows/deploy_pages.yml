@@ -15,6 +15,11 @@ jobs:
         with:
           python-version: "3.7"
 
+      - name: Build and publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo Fooo $GITHUB_TOKEN
+
       - name: Install pipenv
         uses: dschep/install-pipenv-action@v1
 
@@ -24,8 +29,3 @@ jobs:
 
       - name: Install Task
         uses: arduino/setup-task@v1
-
-      - name: Build and publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pipenv run task publish
