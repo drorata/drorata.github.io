@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>When trying to hash a data frame | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/May/26/when-trying-to-hash-a-data-frame/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="TL;DR The function pandas.DataFrame.values is not the inverse of pd.DataFrame(np.array). Introduction An important part of reproducible data science work, is the ability to apply the DAG on the very same dataset. Simplest option is to commit the datasets to a VCS like git. This …">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  When trying to hash a data frame
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-05-26T00:00:00+02:00">
+        <i class="fas fa-clock"></i>
+        Fri 26 May 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/general.html">General</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/python.html">#python</a>,         <a href="../../../../../tag/pandas.html">#pandas</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <h2 id="tldr">TL;DR</h2>
+<p>The function <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.values.html"><code>pandas.DataFrame.values</code></a> is not the inverse of <code>pd.DataFrame(np.array)</code>.</p>
+<h2 id="introduction">Introduction</h2>
+<p>An important part of reproducible data science work, is the ability to apply the <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">DAG</a> on the very same dataset.
+Simplest option is to commit the datasets to a VCS like <code>git</code>.
+This has the problem that VCSs are simply not designed for this.
+Ultimately, a dataset is the result of an ETL process.
+Tracking the ETL process is easy and fits VCSs.
+In some sense this is enough; but not quite right.
+A hidden assumption in this case, is that the sources from which the ETL process fetches the raw data from are not changing.
+This is a rather strong assumption and not necessarily holding in all settings.
+A way to verify that the product of the ETL process is the same is to use two hashes:</p>
+<ol>
+<li>Hash of the code behind the ETL process (you get it for free from <code>git</code>)</li>
+<li>Hash the product of the ETL process; namely, the resulting dataset</li>
+</ol>
+<p>Having these two hashes, one can checkout the code of the ETL process, run it and compare the hash of the resulting dataset and the second hash.
+If the two are the same, we have a very strong indication that the datasets are the same.
+Right, if they are <em>not</em> the same we merely know the two datasets are not the same.
+Most likely due to changes in the sources which feed the ETL process.
+This line of thought made me look into hashing possibilities of <code>pandas.DataFrame</code>s.</p>
+<h2 id="hashing-a-data-frame">Hashing a data frame</h2>
+<p><a href="https://stackoverflow.com/a/41715431/671013">Google</a> suggested that I should represent the data frame in bytes and hash this representation.
+Problem is that there's no straightforward way to turn a data frame into bytes stream.
+A more-or-less canonical way would be to convert the data frame to an array of <code>numpy</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+</code></pre></div>
+
+<p>Here's an example which worked nicely:</p>
+<div class="highlight"><pre><span></span><code><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">41</span><span class="p">,</span> <span class="mi">43</span><span class="p">,</span> <span class="mi">42</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
+</code></pre></div>
+
+<p>Repeatedly evaluating this code always yield the same hash <code>ddfee4572d380bef86d3ebe3cb7bfa7c68b7744f55f67f4e1ca5f6872c2c9ba1</code>.
+However, as soon as we introduce a string into the game, things are no longer predictable.
+Repeatedly invoking the following shows that the hash of the data frame is not kept:</p>
+<div class="highlight"><pre><span></span><code><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="mi">42</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
+</code></pre></div>
+
+<p>The reason here is that <code>df.values != arr</code>.
+As a matter of fact, it seems like each time we evaluate <code>df.value</code> we get a new object.
+Annoyingly enough, <code>np.array_equal(df.values, arr)</code> is <strong>true</strong> because it compares the values.</p>
+<h3 id="workaround">Workaround</h3>
+<p>The workaround I can suggest is to use some string representation of the data frame, and hash the bytes representation of the string representation.
+For example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="mi">42</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
+</code></pre></div>
+
+<p>Obviously the downsides are:</p>
+<ol>
+<li>The hash won't be the same as the one of the original array</li>
+<li>If the data frame is big, this can be very lengthy</li>
+</ol>
+<p>But, it works.
+You can find a summarizing <a href="https://gist.github.com/drorata/bfc5d956c4fb928dcc77510a33009691">notebook here</a>.
+In addition, I have also opened a <a href="https://github.com/pandas-dev/pandas/issues/16517">ticket on the matter</a>.</p>
+<h2 id="solution">Solution</h2>
+<p>Well, it turns out, that opening the bug was helpful.
+As of 0.20.1, it is possible to <a href="https://github.com/pandas-dev/pandas/issues/16517#issuecomment-304364225">hash data frames</a>!</p>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/May/26/when-trying-to-hash-a-data-frame/index.html';
+      this.page.identifier = 'when-trying-to-hash-a-data-frame';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

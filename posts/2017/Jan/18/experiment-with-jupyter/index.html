@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Experiment with Jupyter | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/Jan/18/experiment-with-jupyter/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="Outline how to utilize Jupyter notebooks.">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Experiment with Jupyter
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-01-18T00:00:00+01:00">
+        <i class="fas fa-clock"></i>
+        Wed 18 January 2017
+        (Modified: 2022-08-11)
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/howto.html">HowTo</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/python.html">#python</a>,         <a href="../../../../../tag/jupyter.html">#jupyter</a>,         <a href="../../../../../tag/pelican.html">#pelican</a>,         <a href="../../../../../tag/blogging.html">#blogging</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <p><strong>UPDATE:</strong> The <code>liquid_tags</code> solution seems to have changed a lot and embedding Jupyter notebooks became a little harder.
+Therefore, I'm porting all notebooks to Markdown.
+In the future I will try to find a better solution.</p>
+<p>The notebook <code>factorial-sample.ipynb</code> has been removed.</p>
+<hr>
+
+<p>Using the <a href="https://github.com/getpelican/pelican-plugins/tree/master/liquid_tags">liquid_tags</a> plugin, it seems to be very simple to include Jupyter notebooks. You have to add the plugin in <code>pelicanconf.py</code>; e.g.:</p>
+<div class="highlight"><pre><span></span><code><span class="n">PLUGIN_PATHS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;plugins&quot;</span><span class="p">]</span>
+<span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;render_math&quot;</span><span class="p">,</span> <span class="s2">&quot;liquid_tags.notebook&quot;</span><span class="p">]</span>
+</code></pre></div>
+
+<p>Where in my case the plugins are located in <code>[site's root]/plugins</code>.
+Next, create a directory <code>[site's root]/content/notebooks</code> and add a notebook in there.
+Lastly, create a new Markdown post and include the following:</p>
+<div class="highlight"><pre><span></span><code>{% notebook factorial-sample.ipynb %}
+</code></pre></div>
+
+<p>where <code>factorial-sample.ipynb</code> is the notebook's filename.
+Don't forget to include in the post (<code>.md</code>) the needed metadata like <code>Title</code>, <code>Date</code> etc.</p>
+<h2 id="example">Example</h2>
+<p>The next line till the end of the post is coming from a notebook:</p>
+<p>{% notebook factorial-sample.ipynb %}</p>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/Jan/18/experiment-with-jupyter/index.html';
+      this.page.identifier = 'experiment-with-jupyter';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

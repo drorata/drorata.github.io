@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Pillars of reproducible data science work | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/Mar/16/pillars-of-reproducible-data-science-work/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="What does it take to have reproducible data science work? Present a minimal example using Docker.">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Pillars of reproducible data science work
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-03-16T00:00:00+01:00">
+        <i class="fas fa-clock"></i>
+        Thu 16 March 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/ds.html">DS</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/docker.html">#docker</a>,         <a href="../../../../../tag/jupyter.html">#jupyter</a>,         <a href="../../../../../tag/reproducible.html">#reproducible</a>,         <a href="../../../../../tag/research.html">#research</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <h1 id="bare-minimum-of-reproducible-work">Bare minimum of reproducible work</h1>
+<p>The output of software development is naturally a software.
+However, when a software developer presents his or her work the compiled binaries are not the whole story.
+It is important to present also the source code, which has to be readable, meet the coding conventions of the team, testable, etc. etc.
+As software engineering dates back to the 60s of the previous century<sup id="fnref:7d3740b4"><a class="footnote-ref" href="#fn:7d3740b4">1</a></sup> the industry has well established methods, paradigms and processes that enable successful software development.
+Reproducible work in the context of software development means that the binaries can be recompiled by someone who is not the original developer.</p>
+<p>However, in the context of output of data science work, reproducibility depends on slightly different set of elements:</p>
+<ol>
+<li><em>Result:</em> It goes without saying that you need to have results if you want to present your work.
+One should be able to compare the reproduced result to the original one.
+In the case of data science result may be an analysis, report, dashboard, trained and tested model, etc.
+Having software development in mind, this part is equivalent to the compiled binaries provided by a developer.</li>
+<li><em>Source code:</em>  By merely presenting the result of the work, the deliverable is not complete.
+Just like in software development, the binaries on their own are not enough to account as a complete work.
+It is important to show the way; how the results were achieved.
+In other words, sharing the the source code together with the results is crucial.</li>
+<li><em>Data:</em> Source code alone is not enough.
+For data science related work, the source code is not enough as it has to crunch some numbers.
+The numbers are available in the data set which was considered when the scientist worked on the task.
+Without the data the sources cannot be evaluated and the result cannot be reproduced.
+Let me stress it, for real reproduction the very same data set(s) has to be provided alongside the code.</li>
+<li><em>Environment:</em> Even if you have the sources and the data that the scientist used for generating the results, you might still be lightyears away from being able to reproduce them.
+For example, results were generated using the development branch version of Pandas and you only have the stable version installed.</li>
+</ol>
+<p>In other words, if you want to enable someone to reproduce your work, you have to provide a complete package consisting of all the above items.
+The result (or results) must be there, otherwise there's no way of introducing a deliverable.
+Next, it might be argued that the simplest item is the source code.
+To that end one can harness the rich experience from the world of software development.
+But what about the rest?
+How do you put everything into one "software" which can be provided for things like</p>
+<ul>
+<li>peer reviewing</li>
+<li>knowledge sharing</li>
+<li>result reproduction</li>
+<li>versioning control</li>
+<li>etc.</li>
+</ul>
+<p>If you <a href="http://lmgtfy.com/?q=reproducible+research+data+science">google related keywords</a> you will find lots of stuff.
+I recently read about <a href="http://pachyderm.io/">Pachyderm</a>; I didn't have the chance to check it.
+You can look in the direction of <a href="https://github.com/airbnb/knowledge-repo">knowledge-repo</a>, and probably endless amount of other possibilities.
+I decided to start and play with <a href="http://docker.io/">Docker</a> when trying to tackle this issue.
+True, you might see people  write that this is a <a href="https://blog.wearewizards.io/why-docker-is-not-the-answer-to-reproducible-research-and-why-nix-may-be">bad solution</a>, but there are always pros and cons.
+You can read more about my first attempt <a href="https://github.com/drorata/mwe-jupyter-docker">here</a>.</p>
+<p>One warning light I see with this approach is the size of the resulting Docker image.
+<a href="https://github.com/drorata/mwe-jupyter-docker/blob/230b683ff0d9c2aed4b632185de5af6015bf92c3/Dockerfile">At first</a>, I used <code>jupyter/minimal-notebook</code> as the base of the image.
+This resulted in a 3.4GB image.
+As per the <a href="https://github.com/jupyter/docker-stacks/issues/205">related discussion</a>, I switched to <code>jupyter/base-notebook</code> and this was a significant improvement.
+Still, the size of the resulting image might be a hurdle when it comes to easily share and distribute the results of data science work.
+<a href="https://blog.replicated.com/engineering/refactoring-a-dockerfile-for-image-size/">This post</a> seems like a good place to look for further size optimization tips.</p>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn:7d3740b4">
+<p>Paul Niquette (1995). <a href="http://www.niquette.com/books/softword/tocsoft.html">"Softword: Provenance for the Word 'Software'"</a>. adapted from Sophisticated: The Magazine ISBN 1-58922-233-4&#160;<a class="footnote-backref" href="#fnref:7d3740b4" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/Mar/16/pillars-of-reproducible-data-science-work/index.html';
+      this.page.identifier = 'pillars-of-reproducible-data-science-work';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>
