@@ -14,19 +14,16 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: "3.7"
-      - run: python --version
+
       - name: Install pipenv
         uses: dschep/install-pipenv-action@v1
+
       - name: Install dependencies
         run: |
           pipenv install
 
-      # - name: Setup submodules
-      #   run: |
-      #     git submodule init
-      #     git submodule update
-
       - name: Install Task
         uses: arduino/setup-task@v1
-      - name: Build pages
-        run: pipenv run task build
+
+      - name: Build and publish
+        run: pipenv run task publish
