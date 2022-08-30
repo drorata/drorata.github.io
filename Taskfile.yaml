@@ -28,3 +28,9 @@ tasks:
     cmds:
       - ghp-import output
       - git push git@github.com:drorata/drorata.github.io.git gh-pages:master
+
+  publish_https:
+    deps: [build]
+    cmds:
+      - ghp-import output
+      - git push https://github.com/drorata/drorata.github.io.git gh-pages:master
