@@ -26,4 +26,6 @@ jobs:
         uses: arduino/setup-task@v1
 
       - name: Build and publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pipenv run task publish
