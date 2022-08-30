@@ -13,3 +13,8 @@ jobs:
         with:
           python-version: "3.7"
       - run: python --version
+      - name: Install pipenv
+        uses: dschep/install-pipenv-action@v1
+      - name: Install dependencies
+        run: |
+          pipenv install
