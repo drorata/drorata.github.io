@@ -18,5 +18,8 @@ jobs:
       - name: Install dependencies
         run: |
           pipenv install
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
       - name: Build pages
         run: task build
