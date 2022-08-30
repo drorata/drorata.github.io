@@ -30,6 +30,8 @@ tasks:
       - git push git@github.com:drorata/drorata.github.io.git gh-pages:master
 
   publish_https:
+    # Same as the publish task,
+    # only using HTTPS so the token could be used when GitHub Actions kick in.
     deps: [build]
     cmds:
       - ghp-import output
