@@ -22,4 +22,4 @@ jobs:
       - name: Install Task
         uses: arduino/setup-task@v1
       - name: Build pages
-        run: task build
+        run: pipenv run task build
