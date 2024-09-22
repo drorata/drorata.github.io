@@ -26,10 +26,10 @@ jobs:
       - name: Install Task
         uses: arduino/setup-task@v1
 
-      # - name: Build and publish
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     # PAT to enable the that happens in the task 'publish_https'
-      #     GIT_PAT: ${{ secrets.MY_PAT }}
-      #   run: |
-      #     poetry run task publish_https
+      - name: Build and publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # PAT to enable the that happens in the task 'publish_https'
+          GIT_PAT: ${{ secrets.MY_PAT }}
+        run: |
+          poetry run task publish_https
