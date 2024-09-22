@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Running Visdom examples within a Docker container | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/Apr/04/running-visdom-examples-within-a-docker-container/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="Docker could be a great tool when you want to try out new technologies without taking the risk of breaking your own system. I decided to use Docker when having a quick look into Visdom the new toy from Facebook. I'll outline the steps I took. Start a minimal container …">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Running Visdom examples within a Docker container
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-04-04T00:00:00+02:00">
+        <i class="fas fa-clock"></i>
+        Tue 04 April 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/howto.html">HowTo</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/docker.html">#docker</a>,         <a href="../../../../../tag/visualization.html">#visualization</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <p>Docker could be a great tool when you want to try out new technologies without taking the risk of breaking your own system.
+I decided to use Docker when having a quick look into <a href="https://github.com/facebookresearch/visdom">Visdom</a> the new toy from Facebook.
+I'll outline the steps I took.</p>
+<h2 id="start-a-minimal-container">Start a minimal container</h2>
+<p>Here I decided to use the readymade <a href="https://hub.docker.com/r/continuumio/anaconda3/">continuumio/anaconda3</a>.
+I started a container:</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-i<span class="w"> </span>-t<span class="w"> </span>-p<span class="w"> </span><span class="m">8097</span>:8097<span class="w"> </span>-v<span class="w"> </span>~/tmp:/opt/notebooks<span class="w"> </span>--name<span class="w"> </span>visdom-test<span class="w"> </span>continuumio/anaconda3<span class="w"> </span>/bin/bash
+</code></pre></div>
+
+<p>Next, I installed <code>Visdom</code>:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>visdom
+</code></pre></div>
+
+<p>Lastly, I could run the server:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>visdom.server
+</code></pre></div>
+
+<p>At this point I could open <a href="http://localhost:8097"><code>http://localhost:8097</code></a> and see the empty visualization.</p>
+<h2 id="running-some-examples">Running some examples</h2>
+<h3 id="basic-example">Basic example</h3>
+<p>I placed a file <code>fb-visdom-example.py</code> in <code>~/tmp</code> containing the example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">visdom</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="n">visdom</span><span class="o">.</span><span class="n">Visdom</span><span class="p">()</span>
+<span class="n">vis</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s1">&#39;Hello, world!&#39;</span><span class="p">)</span>
+<span class="n">vis</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)))</span>
+</code></pre></div>
+
+<p>Then, I started another <code>bash</code> process on my container:</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>visdom-test<span class="w"> </span>/bin/bash
+</code></pre></div>
+
+<p>From the new console I could run the example <code>python /opt/notebooks/fb-visdom-example.py</code></p>
+<h3 id="running-demopy">Running <code>demo.py</code></h3>
+<p>Now, I wanted to run <a href="https://github.com/facebookresearch/visdom/blob/master/example/demo.py"><code>demo.py</code></a>.
+To that end I simply cloned the repository:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/facebookresearch/visdom.git
+</code></pre></div>
+
+<p>and ran the example <code>python /visdom/example/demo.py</code>.
+As a matter of fact, this example breaks on this setting with the following error:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s2">&quot;visdom/example/demo.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">232</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+    <span class="n">viz</span><span class="o">.</span><span class="n">mesh</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">Y</span><span class="p">,</span> <span class="n">opts</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">))</span>
+<span class="ne">AttributeError</span><span class="p">:</span> <span class="s1">&#39;Visdom&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;mesh&#39;</span>
+</code></pre></div>
+
+<p>It is almost the end of the demo, but still a little annoying; I opened a <a href="https://github.com/facebookresearch/visdom/issues/59">bug</a>.
+It turns out that you'd have to install <code>Visdom</code> from the sources and not using <code>pip</code> in order to avoid this problem.</p>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/Apr/04/running-visdom-examples-within-a-docker-container/index.html';
+      this.page.identifier = 'running-visdom-examples-within-a-docker-container';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

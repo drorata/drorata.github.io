@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Playing around with $t$-test | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/Jan/27/playing-around-with-t-test/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="Heights measuring and means evaluations">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Playing around with $t$-test
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-01-27T00:00:00+01:00">
+        <i class="fas fa-clock"></i>
+        Fri 27 January 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/stats.html">Stats</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/t-test.html">#t-test</a>,         <a href="../../../../../tag/hypothesis.html">#hypothesis</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <h1 id="t-test-tested"><span class="math">\(t\)</span>-Test tested</h1>
+<p>(Original notebook can be found in <a href="https://gist.github.com/drorata/cbc60ea3793c2f9f77b1ddfa82f3ccec">this gist</a>)</p>
+<p>In this post we shall try to run a quick experiment with the intention of convincing ourselves that <span class="math">\(t\)</span>-test works.
+We will examine what is the underlaying distribution of many different samples obtained from many different distributions.
+Furthermore, we will see how the size of the sample influence the reliability of the test.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Modules used</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">pylab</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+</code></pre></div>
+
+<h2 id="definitions">Definitions</h2>
+<p><strong>Hypothesis:</strong> a statement about a population parameter. A population may be the users' traffic and the parameter may be conversion rate.</p>
+<p><strong>Objectives:</strong> given sample taken from the population, decide whether the <em>null-hypothesis</em> (<span class="math">\(H_0\)</span>) holds or not.</p>
+<h2 id="example">Example</h2>
+<p>A classical example is to consider the height of a population.
+The null-hypothesis, <span class="math">\(H_0\)</span>, in this case would suggest that the mean of the distribution is <span class="math">\(H_0\)</span>.
+Ideally, we should measure the height of all members of the population, but this is going to be tricky.
+Therefore, we take a sample from the population and measure the heights in the sample.
+The objective of the test is to answer the following question:</p>
+<blockquote>
+<p><em>Does the mean of the underlaying distribution equals to <span class="math">\(H_0\)</span>?</em></p>
+</blockquote>
+<p>So, next, we compute the mean of the sample.
+At this point, we should use the statistical test and answer the question.</p>
+<h2 id="fixed-hypothesis-on-varying-populations">Fixed hypothesis on varying populations</h2>
+<p>Let us set some parameters:</p>
+<div class="highlight"><pre><span></span><code><span class="n">dx</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">146</span><span class="p">,</span><span class="mi">200</span><span class="o">+</span><span class="n">dx</span><span class="p">,</span><span class="n">dx</span><span class="p">)</span>
+<span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>
+<span class="n">STD</span><span class="o">=</span><span class="mi">20</span>
+<span class="n">H0</span><span class="o">=</span><span class="mi">172</span>
+</code></pre></div>
+
+<p>In this experiment we fix <span _H0="{H0" class="math">\(H_0=\)</span>} and we apply the <span class="math">\(t\)</span>-test on various samples obtained from different normal distributions.
+For simplicity, we use fixed STD for the distribution and varying means.</p>
+<p>Next, for each size <span class="math">\(n\)</span> and mean <span class="math">\(\mu\)</span>, we generate a sample of size <span class="math">\(n\)</span> with mean <span class="math">\(\mu\)</span>.
+Recall, the STD is fixed.</p>
+<div class="highlight"><pre><span></span><code><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">sizes</span><span class="p">:</span>
+    <span class="c1"># For a fixed size, genearte list of samples, one sample for each mean</span>
+    <span class="n">fixed_size_samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">mean</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">STD</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">))</span> <span class="k">for</span> <span class="n">mean</span> <span class="ow">in</span> <span class="n">means</span><span class="p">]</span>
+    <span class="n">samples</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">)]</span> <span class="o">=</span> <span class="n">fixed_size_samples</span>
+<span class="n">samples</span><span class="o">.</span><span class="n">index</span><span class="o">=</span><span class="n">means</span>
+</code></pre></div>
+
+<p>The snippet above generates a matrix where each row has samples with the same mean and each column has samples with the same size.
+The index of the <code>DataFrame</code> is the mean in use and the column name is the size of the sample.
+Here are the first 3 rows:</p>
+<div class="highlight"><pre><span></span><code><span class="n">samples</span><span class="o">.</span><span class="n">loc</span><span class="p">[:</span><span class="mi">148</span><span class="p">]</span> <span class="c1"># Note that the index is the mean used!</span>
+</code></pre></div>
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>10</th>
+      <th>50</th>
+      <th>100</th>
+      <th>500</th>
+      <th>1000</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>146.0</th>
+      <td>0    172.631730
+1    160.305579
+2    115.09199...</td>
+      <td>0     146.094211
+1     148.940679
+2     136.74...</td>
+      <td>0     136.876549
+1     168.284188
+2     148.19...</td>
+      <td>0      119.963494
+1      148.695017
+2      175...</td>
+      <td>0      127.606195
+1      145.544374
+2      166...</td>
+    </tr>
+    <tr>
+      <th>147.0</th>
+      <td>0    155.660524
+1    171.060747
+2    127.69868...</td>
+      <td>0     158.413869
+1     136.742496
+2     152.51...</td>
+      <td>0     177.846774
+1     162.064209
+2     136.09...</td>
+      <td>0      166.033778
+1      146.662981
+2      159...</td>
+      <td>0      142.859633
+1      104.352055
+2      127...</td>
+    </tr>
+    <tr>
+      <th>148.0</th>
+      <td>0    108.445434
+1    113.132554
+2    153.32140...</td>
+      <td>0     150.522897
+1     160.511639
+2     147.46...</td>
+      <td>0     128.513003
+1     118.104262
+2     142.10...</td>
+      <td>0      159.761616
+1      159.145997
+2      113...</td>
+      <td>0      152.074143
+1      150.470116
+2      160...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Following is the histogram of the sample that has <span class="math">\(500\)</span> samples with mean <span class="math">\(\mu = 163\)</span></p>
+<div class="highlight"><pre><span></span><code><span class="n">samples</span><span class="p">[</span><span class="s1">&#39;500&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">163</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">();</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/Hypothesis-testing_11_0.png"></p>
+<p>One may guess, based on the visual observation, that the sample was obtained from a normal distribution with mean between <span class="math">\(150\)</span> and <span class="math">\(170\)</span>.
+Which is indeed the case, the mean was <span class="math">\(163\)</span>.
+But, how can be test it rigorously?</p>
+<p>The answer is <span class="math">\(t\)</span>-test.
+We will iterate over all the samples, and run a <span class="math">\(t\)</span>-test against the fixed <span class="math">\(H_0\)</span>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">p_vals</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">stats</span><span class="o">.</span><span class="n">ttest_1samp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">H0</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">p_vals</span><span class="o">.</span><span class="n">loc</span><span class="p">[:</span><span class="mi">148</span><span class="p">]</span>
+</code></pre></div>
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>10</th>
+      <th>50</th>
+      <th>100</th>
+      <th>500</th>
+      <th>1000</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>146.0</th>
+      <td>0.000794</td>
+      <td>6.893325e-12</td>
+      <td>5.382195e-22</td>
+      <td>5.135664e-103</td>
+      <td>6.562808e-221</td>
+    </tr>
+    <tr>
+      <th>147.0</th>
+      <td>0.006270</td>
+      <td>1.246921e-08</td>
+      <td>4.854901e-21</td>
+      <td>3.431649e-98</td>
+      <td>5.551791e-198</td>
+    </tr>
+    <tr>
+      <th>148.0</th>
+      <td>0.091243</td>
+      <td>9.588379e-15</td>
+      <td>6.716187e-23</td>
+      <td>7.625131e-98</td>
+      <td>6.041672e-186</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the above table, each cell contains the <span class="math">\(p\)</span>-value of the <span class="math">\(t\)</span>-test of the corresponding sample against the fixed null-hypothesis <span class="math">\(H_0 =\)</span> {{H0}}.</p>
+<p><strong>Reminder: What is the <span class="math">\(p\)</span>-values?</strong></p>
+<p>The <span class="math">\(p\)</span>-value is the probability of observing the result under the assumption of <span class="math">\(H_0\)</span>.
+Recall, that a well accepted threshold for null-hypothesis rejection is <span class="math">\(\alpha = 0.05\)</span>.
+In other words, if the <span class="math">\(p\)</span>-value is smaller than <span class="math">\(\alpha\)</span>, we reject the null-hypothesis.
+In the next step we mark with <span class="math">\(1\)</span> (i.e. accepted) the cases where the <span class="math">\(p\)</span>-value was greater than <span class="math">\(\alpha\)</span> and with <span class="math">\(0\)</span> otherwise (i.e. rejected).</p>
+<p>More intuitively, if the label is <span class="math">\(0\)</span>, we can claim that mean of the distribution from which the sample was taken is <em>not</em> <span class="math">\(0\)</span>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">accepted</span> <span class="o">=</span> <span class="n">p_vals</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p_val</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">p_val</span> <span class="o">&lt;</span> <span class="mf">0.05</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">accepted</span><span class="o">.</span><span class="n">loc</span><span class="p">[:</span><span class="mi">148</span><span class="p">]</span>
+</code></pre></div>
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>10</th>
+      <th>50</th>
+      <th>100</th>
+      <th>500</th>
+      <th>1000</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>146.0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>147.0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>148.0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Let us now plot a "heat-map" of the <span class="math">\(0-1\)</span> matrix above:</p>
+<div class="highlight"><pre><span></span><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">heatmap</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">accepted</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">accepted</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">tick_top</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">accepted</span><span class="o">.</span><span class="n">index</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">minor</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">accepted</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">minor</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">accepted</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">minor</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">accepted</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">minor</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Means&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Sample size&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/Hypothesis-testing_17_0.png"></p>
+<p>In the above graph, every red cell corresponds to a <span class="math">\(t\)</span>-test of a sample with given size obtained from a normal distribution with given mean.</p>
+<ul>
+<li>RED: means that the null-hypothesis cannot be rejected. That is, the obtained sample is likely to be obtained given the null-hypothesis.</li>
+<li>BLUE: means that the null-hypothesis has to be rejected. That is, it is very unlikely that we witness the sample assuming <span class="math">\(H_0\)</span> holds.</li>
+</ul>
+<p>We see, that the bigger the sample is, the more accurate the test is.
+Still, starting from a sample size of 50, we already manage to reject about <span class="math">\(2/3\)</span> of the samples.
+It gets much better the denser the sample is.</p>
+<p>In general, the smaller the sample, the more likely it is to accept the null-hypothesis even when it is wrong; see sample size of 10 and mean 148.
+However, the bigger the sample, the more precises the test is; i.e. we correctly identify whether the underlying distribution has a mean equals to <span class="math">\(H_0\)</span> or not.</p>
+<h2 id="links">Links</h2>
+<ul>
+<li><a href="http://www.dummies.com/education/math/statistics/what-a-p-value-tells-you-about-statistical-data/">What a p value tells you about statistical data</a></li>
+<li><a href="https://docs.scipy.org/doc/scipy-0.18.1/reference/tutorial/stats.html">SciPy Stats</a></li>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html#scipy.stats.ttest_1samp">t-Test SciPy</a></li>
+</ul>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/Jan/27/playing-around-with-t-test/index.html';
+      this.page.identifier = 'playing-around-with-t-test';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Moving from local machine to Dask cluster using Terraform | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2018/Jan/05/moving-from-local-machine-to-dask-cluster-using-terraform/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="Tutorial on how to start a cluster of dask instances on AWS (EC2). Using this cluster execute an expansive grid search.">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Moving from local machine to Dask cluster using Terraform
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2018-01-05T00:00:00+01:00">
+        <i class="fas fa-clock"></i>
+        Fri 05 January 2018
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/howto.html">HowTo</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/python.html">#python</a>,         <a href="../../../../../tag/dask.html">#dask</a>,         <a href="../../../../../tag/cluster.html">#cluster</a>,         <a href="../../../../../tag/settings.html">#settings</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <h2 id="introduction">Introduction</h2>
+<p>As part of the never-ending effort to improve reBuy and turn it into a market leader, we recently decided to tackle the challenges of our customer services agents.
+As a first step, a dump of tagged emails was created and the first goal was set: build a POC that tags the emails automatically.
+To that end, NLP had to be used and a lengthy (and greedy) <a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html">grid search</a> had to be executed.
+So lengthy, that 4 cores of a notebook were working for couple of hours with no results.
+This was the point when I decided to explore <a href="http://dask.pydata.org/en/latest/"><code>dask</code></a> and its sibling <a href="https://distributed.readthedocs.io/en/latest/"><code>distributed</code></a>.
+In this tutorial/post we shall discuss how to take a local code doing grid search using Scikit-Learn to a cluster of AWS (EC2) nodes.</p>
+<p>The full tutorial, including source files, can be found <a href="https://github.com/drorata/ds-dask_cluster_example">here</a>, where the <a href="https://github.com/drorata/ds-dask_cluster_example/blob/master/README.md">README</a> is the entrypoint.</p>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2018/Jan/05/moving-from-local-machine-to-dask-cluster-using-terraform/index.html';
+      this.page.identifier = 'moving-from-local-machine-to-dask-cluster-using-terraform';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

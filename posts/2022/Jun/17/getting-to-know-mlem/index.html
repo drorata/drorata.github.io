@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Getting to know MLEM | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2022/Jun/17/getting-to-know-mlem/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="This post is based on the README here where newer versions might be available. MLEM promises that you: Use the same human-readable format for any ML framework This is a bold promise and in this repo I will explore it a little (and maybe some other features as well). Note …">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Getting to know MLEM
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2022-06-17T00:00:00+02:00">
+        <i class="fas fa-clock"></i>
+        Fri 17 June 2022
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/ml.html">ML</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/mlops.html">#MLops</a>,         <a href="../../../../../tag/workflows.html">#workflows</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <p><em>This post is based on the README <a href="https://github.com/drorata/mlem-review/blob/main/README.md">here</a> where newer versions might be available.</em></p>
+<p><a href="https://mlem.ai/">MLEM</a> promises that you:</p>
+<blockquote>
+<p>Use the same human-readable format for any ML framework</p>
+</blockquote>
+<p>This is a bold promise and in this repo I will explore it a little (and maybe some other features as well).
+Note that the machine learning part of the content is only secondary.
+In the foreground we put the process and the tools.</p>
+<h2 id="fetching-and-preparing-the-data">Fetching and preparing the data 👷🏽‍♀️</h2>
+<p>To keep it simple on the ML front, we use the <a href="https://scikit-learn.org/stable/auto_examples/datasets/plot_iris_dataset.html">Iris data set</a>.
+The data is obtained in <a href="https://github.com/drorata/mlem-review/blob/3609bd31b65ecbc3623447b8e9608f7fad1845d0/get_data.py"><code>get_data.py</code></a>; see the comments there for more details.</p>
+<p>This script is used in the first stage of the DVC pipeline <a href="https://github.com/drorata/mlem-review/blob/3609bd31b65ecbc3623447b8e9608f7fad1845d0/dvc.yaml#L3-L10"><code>dvc.yaml</code></a>.</p>
+<h2 id="training-the-model-and-persisting-it-using-mlem">Training the model and persisting it using MLEM 🚀</h2>
+<p>In <a href="https://github.com/drorata/mlem-review/blob/3609bd31b65ecbc3623447b8e9608f7fad1845d0/train_and_persist.py"><code>train_and_persist.py</code></a> we, well, train and persist the model.
+Again, in <a href="https://github.com/drorata/mlem-review/blob/3609bd31b65ecbc3623447b8e9608f7fad1845d0/dvc.yaml#L12-L19"><code>dvc.yaml</code></a> this script is used as the second stage.
+Here it is important to pay more attention to the <code>mlem.api.save()</code> statement:</p>
+<div class="highlight"><pre><span></span><code><span class="n">save</span><span class="p">(</span>
+    <span class="n">rf</span><span class="p">,</span> <span class="s2">&quot;rf&quot;</span><span class="p">,</span> <span class="n">sample_data</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Random Forest Classifier&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p><code>rf</code> is the fitted model and it is given a name; the <em>string</em> <code>"rf"</code>.
+In addition a description is provided (See issue <a href="https://github.com/iterative/mlem/issues/279">#279</a> for a related topic).
+Furthermore, by providing a value to the parameter <code>sample_data</code>, MLEM will include the schema of the data in the model's meta data.
+Checkout <a href="https://github.com/drorata/mlem-review/blob/3609bd31b65ecbc3623447b8e9608f7fad1845d0/.mlem/model/rf.mlem#L13-L24"><code>.mlem/model/rf.mlem</code></a>.</p>
+<h2 id="whats-next-or-how-to-get-predictions-using-an-api">What's next? Or how to get predictions using an API? ⚡️</h2>
+<p>By running <code>dvc repro</code> in this project following things will happen:</p>
+<ul>
+<li>Iris data set will be fetched and splitted into train and test sets.</li>
+<li>A model will be train.</li>
+<li>The model will be persisted by MLEM; its metadata (<a href="https://github.com/drorata/mlem-review/blob/3609bd31b65ecbc3623447b8e9608f7fad1845d0/.mlem/model/rf.mlem"><code>.mlem/model/rf.mlem</code></a>) will be tracked by Git and the model itself (<code>.mlem/model/rf</code>) will be tracked by DVC.</li>
+</ul>
+<p>Now comes the fun part.
+By running:</p>
+<div class="highlight"><pre><span></span><code>mlem<span class="w"> </span>build<span class="w"> </span>rf<span class="w"> </span>docker<span class="w"> </span>--conf<span class="w"> </span>server.type<span class="o">=</span>fastapi<span class="w"> </span>--conf<span class="w"> </span>image.name<span class="o">=</span>rf-image-test
+</code></pre></div>
+
+<p>MLEM will build a docker image that can be used to get predictions from the trained model using an API.
+Once the image is built, a container can be ran:</p>
+<div class="highlight"><pre><span></span><code>docker run --rm -it -p 8080:8080 rf-image-test
+</code></pre></div>
+
+<p>As soon as it is up and running, the documentation of the endpoints of the new API can be found here: http://0.0.0.0:8080/docs.</p>
+<p>To make it easier, <a href="https://github.com/drorata/mlem-review/blob/3609bd31b65ecbc3623447b8e9608f7fad1845d0/Taskfile.yml"><code>Taskfile.yml</code></a> can help in building and serving the image.
+For more details on how to use a <code>Taskfile</code>, checkout <a href="https://taskfile.dev/"><code>task</code></a>.</p>
+<p>Finally, once MLEM is serving the model, we can get predictions for our test set using <a href="https://github.com/drorata/mlem-review/blob/3609bd31b65ecbc3623447b8e9608f7fad1845d0/evaluate.py"><code>evaluate.py</code></a>.
+To that end we simply send a list of dictionaries to the <code>/predict</code> end point and get, in return, a list of predictions.
+Isn't it really wonderful?</p>
+<p><center>
+<img src="https://cdn.pixabay.com/photo/2020/06/04/08/50/awesome-5257905_1280.png" alt="Isn't it awesome?" width=25% height=25%>
+</center></p>
+<h2 id="summary">Summary</h2>
+<p>So, in <a href="https://github.com/drorata/mlem-review">this repository</a> you can find an end-to-end example how to bring your ML model to life as an API that can return predictions.
+This bridges a huge hurdle that data science teams face.
+After completing the hard work related to data fetching, cleaning, feature engineering, models training/evaluation/tuning and so on, the team is ready to deliver great value.
+Alas... Now support from DevOps and Data engineers is needed to bring the model to production.
+Using MLEM, the team is much closer to be independent and impact directly and quickly.</p>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2022/Jun/17/getting-to-know-mlem/index.html';
+      this.page.identifier = 'getting-to-know-mlem';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

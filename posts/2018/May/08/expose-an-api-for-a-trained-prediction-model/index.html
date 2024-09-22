@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Expose an API for a trained prediction model | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2018/May/08/expose-an-api-for-a-trained-prediction-model/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="You will build a RESTful API exposing a trained prediction model.">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Expose an API for a trained prediction model
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2018-05-08T00:00:00+02:00">
+        <i class="fas fa-clock"></i>
+        Tue 08 May 2018
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/ds.html">DS</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/python.html">#python</a>,         <a href="../../../../../tag/docker.html">#docker</a>,         <a href="../../../../../tag/model.html">#model</a>,         <a href="../../../../../tag/sklearn.html">#sklearn</a>,         <a href="../../../../../tag/it.html">#IT</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <h2 id="why">Why?</h2>
+<p>This is rather clear.
+As a data scientist, you worked hard.
+You got the data, you explored it, and identified the important features.
+Next, you spent days wondering in the mighty hyper-parameters space.
+Bottom line, you have trained the best model which can now become part of the production environment.
+Alas, to that end you need to turn your model into something more interactive.
+In this post, you will learn how to get started with <a href="http://flask.pocoo.org/">Flask</a> and expose a RESTful API that can communicate with the trained model.</p>
+<h2 id="training-the-model">Training the model</h2>
+<p>This is out of the scope of this post.
+In what follows I assume you have something like:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sklearn.externals</span> <span class="kn">import</span> <span class="n">joblib</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="s1">&#39;pipeline.pkl&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Where <code>pipeline</code> is a Scikit-learn pipeline.
+Pay attention to the nature of the unseen data points that you would like to feed into the pipeline using the API.
+You should make sure that the pipeline can handle the unseen data points; for example take care of preprocessing steps.
+If this is not the case, you have to take care and enable the application to preprocess the data.</p>
+<h2 id="flask-application">Flask application</h2>
+<p>Include the following snippet in a file <code>app.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app.py</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">sklearn.externals</span> <span class="kn">import</span> <span class="n">joblib</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">train_model</span> <span class="k">as</span> <span class="nn">tm</span> <span class="c1"># Implementation of preprocessing steps outside of</span>
+                         <span class="c1"># the pipeline&#39;s scope</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/predict&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">predict</span><span class="p">():</span>
+    <span class="n">json_</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+
+    <span class="n">query_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">json_</span><span class="p">)</span>
+
+    <span class="n">query</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">(</span><span class="n">query_df</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">prediction</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;prediction&#39;</span><span class="p">:</span> <span class="n">prediction</span><span class="p">})</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;pipeline.pkl&#39;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>This is it.
+Execute <code>python app.py</code> and send unseen data points to <code>0.0.0.0:5000</code>.</p>
+<h2 id="asking-the-application-for-predictions">Asking the application for predictions</h2>
+<p>Assume you have <code>data.json</code> having the following JSON with unseen data points:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;feat1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;0&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;1&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;feat2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;0&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">3.14</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;1&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">2.71</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>You can send this JSON to your already running using <a href="https://curl.haxx.se/"><code>curl</code></a>:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span>--data<span class="w"> </span>@data.json<span class="w"> </span>http://0.0.0.0:5000/predict
+</code></pre></div>
+
+<p>or using <a href="https://httpie.org/"><code>httpie</code></a>:</p>
+<div class="highlight"><pre><span></span><code>http<span class="w"> </span>POST<span class="w"> </span>http://0.0.0.0:5000/predict<span class="w"> </span>&lt;<span class="w"> </span>data.json
+</code></pre></div>
+
+<p>It is as simple as that.
+Of course, you are likely to need way more, but I am sure this will serve as a good start.</p>
+<h2 id="minimal-working-example">Minimal working example</h2>
+<p>Simplest way to experience a prediction model API is to run the docker image I prepared:</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w"> </span>drorata/pm_api:v1
+</code></pre></div>
+
+<p>Once the container is running you can throw at it the following JSON:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;Age&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;53&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">28</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;111&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;Cabin&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;53&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;C23 C25 C27&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;111&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;Embarked&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;53&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;S&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;111&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Q&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;Fare&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;53&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">263</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;111&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">7.7792</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;Name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;53&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Fortune, Miss. Ethel Flora&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;111&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Shine, Miss. Ellen Natalia&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;Parch&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;53&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;111&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;PassengerId&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;53&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">945</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;111&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1003</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;Pclass&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;53&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;111&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;Sex&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;53&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;female&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;111&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;female&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;SibSp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;53&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;111&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;Ticket&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;53&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;19950&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;111&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;330968&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>If you want to see more details, this image is built using the sources available in <a href="https://github.com/drorata/pm_api">this repository</a>.
+You can create a local python environment, install the requirements and enjoy the example.</p>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2018/May/08/expose-an-api-for-a-trained-prediction-model/index.html';
+      this.page.identifier = 'expose-an-api-for-a-trained-prediction-model';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

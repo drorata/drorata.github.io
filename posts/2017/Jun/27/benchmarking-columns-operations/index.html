@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Benchmarking Columns Operations | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/Jun/27/benchmarking-columns-operations/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="Benchmarking different ways to process two columns simultaneously.">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Benchmarking Columns Operations
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-06-27T00:00:00+02:00">
+        <i class="fas fa-clock"></i>
+        Tue 27 June 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/ds.html">DS</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/python.html">#python</a>,         <a href="../../../../../tag/pandas.html">#pandas</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <p>(Original notebook can be found in <a href="https://gist.github.com/drorata/3716f915ffc020bfbb109b5d4d5952c0">this gist</a>)</p>
+<p>I recently ran the following experiment.
+The reason was my need to perform operations on two columns.
+Think for example in terms of features engineering; you want to produce an new feature (i.e. column) which is the ratio of the some other two columns.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span><span class="mi">2</span><span class="p">)),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>foo</th>
+      <th>bar</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.065648</td>
+      <td>0.593402</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.592051</td>
+      <td>0.123502</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.621030</td>
+      <td>0.629470</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.210630</td>
+      <td>0.462535</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.263708</td>
+      <td>0.807304</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="iterating-over-the-rows">Iterating over the rows</h2>
+<p>Here we iterate over the rows, and access the indexes of the <code>pd.Series</code> which represents the row.</p>
+<div class="highlight"><pre><span></span><code><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span>
+    <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+<span class="p">])</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">518</span><span class="w"> </span><span class="n">ms</span><span class="w"> </span><span class="err">±</span><span class="w"> </span><span class="mf">60</span><span class="w"> </span><span class="n">ms</span><span class="w"> </span><span class="n">per</span><span class="w"> </span><span class="n">loop</span><span class="w"> </span><span class="p">(</span><span class="n">mean</span><span class="w"> </span><span class="err">±</span><span class="w"> </span><span class="n">std</span><span class="mf">.</span><span class="w"> </span><span class="n">dev</span><span class="mf">.</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="mf">7</span><span class="w"> </span><span class="kr">run</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="n">loop</span><span class="w"> </span><span class="n">each</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="applying-a-function">Applying a function</h2>
+<p>Here we use <code>pd.DataFrame.apply</code> and provide the axis.
+This is actually, the solution I had to use in a case which I now longer remember its details.</p>
+<div class="highlight"><pre><span></span><code><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">299</span><span class="w"> </span><span class="n">ms</span><span class="w"> </span><span class="err">±</span><span class="w"> </span><span class="mf">43.1</span><span class="w"> </span><span class="n">ms</span><span class="w"> </span><span class="n">per</span><span class="w"> </span><span class="n">loop</span><span class="w"> </span><span class="p">(</span><span class="n">mean</span><span class="w"> </span><span class="err">±</span><span class="w"> </span><span class="n">std</span><span class="mf">.</span><span class="w"> </span><span class="n">dev</span><span class="mf">.</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="mf">7</span><span class="w"> </span><span class="kr">run</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="n">loop</span><span class="w"> </span><span class="n">each</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="columns-operations">Columns operations</h2>
+<p>Best and fastest approach; at least for this simple case.</p>
+<div class="highlight"><pre><span></span><code><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">df</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">bar</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">97.2</span><span class="w"> </span><span class="n">µs</span><span class="w"> </span><span class="err">±</span><span class="w"> </span><span class="mf">11.9</span><span class="w"> </span><span class="n">µs</span><span class="w"> </span><span class="n">per</span><span class="w"> </span><span class="n">loop</span><span class="w"> </span><span class="p">(</span><span class="n">mean</span><span class="w"> </span><span class="err">±</span><span class="w"> </span><span class="n">std</span><span class="mf">.</span><span class="w"> </span><span class="n">dev</span><span class="mf">.</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="mf">7</span><span class="w"> </span><span class="kr">run</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="mf">10000</span><span class="w"> </span><span class="n">loops</span><span class="w"> </span><span class="n">each</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="summary">Summary</h2>
+<p>Obviously, for the simple multiplication, the last option is the most pythonic (and the fastest as well).
+But, still due to an edge case I decided to run this test.
+Maybe someone would find it helpful.</p>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/Jun/27/benchmarking-columns-operations/index.html';
+      this.page.identifier = 'benchmarking-columns-operations';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

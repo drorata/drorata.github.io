@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>SQL Server and macOS --- my first take | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/May/08/sql-server-and-macos-my-first-take/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="The 90s are back and it turns out that cross platform approach doesn't apply for MS SQL Server.">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  SQL Server and macOS --- my first take
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-05-08T00:00:00+02:00">
+        <i class="fas fa-clock"></i>
+        Mon 08 May 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/general.html">General</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/sql.html">#SQL</a>,         <a href="../../../../../tag/atom.html">#atom</a>,         <a href="../../../../../tag/python.html">#python</a>,         <a href="../../../../../tag/mac.html">#mac</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <p>Recently, I started working at <a href="http://www.rebuy.com">reBuy</a> and discovered that the data warehouse has recently migrated to <a href="https://en.wikipedia.org/wiki/Microsoft_SQL_Server">MS SQL Server</a>.
+Naively, I thought that it would not be much of an impediment; I was wrong.
+Over the past 7 years I am mostly using Mac, and beforehand I used to have Linux boxes for couple of years.
+The last time I really worked on a Windows machine was 10+ years ago.
+By sharing this history with you, I try to explain why I didn't consider switching to Microsoft OS.</p>
+<p>Not too surprisingly, as a data scientist, the first step on day <span class="math">\(1 + \epsilon\)</span> was to access the data.
+At this point my affection to macOS and the company's DWH conflicted.
+One of the first stops in the journey to solve the conflict was this <a href="http://stackoverflow.com/q/3452/671013">SO thread</a>.
+This thread is a good example of a question whose answer is not really solving the problem introduced by the poster.</p>
+<h2 id="desktop-client">Desktop client</h2>
+<p>Before diving into hacky workarounds, I tried virtually all the clients suggested in that post.
+To cut a long story short, I ended up using <a href="https://www.dbvis.com/">DBVisualizer</a>.
+Its free version is OK and at least allows one to execute SQL queries.
+To be honest, I didn't try to evaluate any kind of more fancy features.
+It managed to address the immediate need --- first look at the data checked.</p>
+<h2 id="whats-next">What's next?</h2>
+<p>I feel relatively comfortable with SQL, but I am much more comfortable and productive with Pandas.
+So, the next step for me was to figure out how to query the DWH from Python.
+For example, I wanted to take advantage of <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_sql_query.html"><code>pandas.read_sql_query</code></a>.
+This led me to investigate how to connect <a href="https://www.sqlalchemy.org/">SQLalchemy</a> to MS SQL <em>from a macOS box</em>.
+Ultimately I found two ways: one using <a href="http://pymssql.org/en/stable/"><code>pymssql</code></a> alone and the other together with SQLalchemy.</p>
+<h3 id="pymssql-alone"><code>pymssql</code> alone</h3>
+<p>In order to establish the connection I ran:</p>
+<div class="highlight"><pre><span></span><code><span class="n">conn</span> <span class="o">=</span> <span class="n">pymssql</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">server</span><span class="o">=</span><span class="s2">&quot;my.great.server&quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s2">&quot;WINDOWSDOMAIN\username&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;mysecretpassword&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">1433</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Note the need to provide the domain (in capital letters).
+In turn, an actual query can be executed:</p>
+<div class="highlight"><pre><span></span><code><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;select top 10 * from db.schema.table1&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+</code></pre></div>
+
+<h3 id="pymssql-and-sqlalchemy-together"><code>pymssql</code> and SQLalchemy together</h3>
+<p>I also managed to query the DWH using a combination of <code>pymssql</code> and SQLalchemy.</p>
+<div class="highlight"><pre><span></span><code><span class="n">eng</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;mssql+pymssql://WINDOWSDOMAIN\username:mysecretpassword@my.great.server:1433/db&quot;</span><span class="p">)</span>
+<span class="n">connection</span> <span class="o">=</span> <span class="n">eng</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select top 10 * from schema.table1&quot;</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="p">])</span>
+</code></pre></div>
+
+<p>As a side remark, which probably deserve a post of its own, once using SQLalchemy I also managed to connect <a href="https://github.com/airbnb/superset">Superset</a> to the DWH. YAY.</p>
+<h2 id="atom-ic-connection">Atom-ic connection?</h2>
+<p>DBVisualizer is/was OK.
+Nothing more.
+I like using my keyboard and as my editor of choice is Atom, I decided to try and utilize it.
+It worked out <em>fabulously</em>.
+The needed package is <a href="https://atom.io/packages/data-atom">Data Atom</a> and the setting up is rather straightforward.
+You might want to fiddle with the <a href="https://github.com/lukemurray/data-atom/issues/125"><code>Timeout</code> setting</a> but as long as the results set is limited this works like a charm.</p>
+<p>Interestingly, I failed to connect Visual Studio Code to the DWH.
+I thought that as MS are developing VSC, it is likely that the DWH and the celebrated editor will be able to communicate.
+In theory this is <a href="https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-develop-use-vscode">possible</a>, but in practice, from a macOS box, <a href="https://github.com/Microsoft/vscode-mssql/issues/824#issuecomment-296846325">it is not</a>.</p>
+<h2 id="securing-the-passwords">Securing the passwords</h2>
+<p>I ended up, for the time being, using Atom and DBVisualizer.
+I spend most of my time on the DWH using Atom, and revert to the latter tool when I need to explore the schema of the database.
+Once I know what I need, I take the results set offline into Pandas.
+The biggest concern I have at the moment is the securing of the passwords.
+Both for <code>pymssql</code> and the Data Atom package, the passwords are stored as strings.
+I didn't find a way around it yet albeit I'm sure there must be one; after all Superset manages the passwords somehow.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/May/08/sql-server-and-macos-my-first-take/index.html';
+      this.page.identifier = 'sql-server-and-macos-my-first-take';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

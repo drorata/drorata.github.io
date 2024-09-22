@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Installing Spark on macOS (Sierra) | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/Jan/16/installing-spark-on-macos-sierra/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="How did I install Spark on my macOS">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Installing Spark on macOS (Sierra)
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-01-16T00:00:00+01:00">
+        <i class="fas fa-clock"></i>
+        Mon 16 January 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/howto.html">HowTo</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/spark.html">#spark</a>,         <a href="../../../../../tag/jupyter.html">#jupyter</a>,         <a href="../../../../../tag/python.html">#python</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <div class="toc">
+<ul>
+<li><a href="#download-spark">Download Spark</a></li>
+<li><a href="#set-and-test">Set and test</a><ul>
+<li><a href="#tree-structure">Tree structure</a></li>
+<li><a href="#environment-variables">Environment variables</a></li>
+<li><a href="#test">Test</a></li>
+</ul>
+</li>
+<li><a href="#use-ipython-and-jupyter">Use IPython and Jupyter</a></li>
+</ul>
+</div>
+<h1 id="download-spark">Download Spark</h1>
+<ul>
+<li>First, download Spark.
+I downloaded the binaries given as <a href="http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-hadoop2.7.tgz"><code>spark-2.1.0-bin-hadoop2.7</code></a></li>
+<li>You'd also need to install the JDK; I took it from <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">here</a></li>
+</ul>
+<h1 id="set-and-test">Set and test</h1>
+<h2 id="tree-structure">Tree structure</h2>
+<p>Simply installing Spark is simple.
+All you have to do is extract the archive.
+I placed the extracted binaries in <code>~/Applications</code>, resulting in the following tree structure:</p>
+<div class="highlight"><pre><span></span><code>~/Applications
+└── spark-2.1.0-bin-hadoop2.7
+</code></pre></div>
+
+<p>At this point, you can already run Spark.
+Look for <code>~/Applications/spark-2.1.0-bin-hadoop2.7/bin/pyspark</code>.
+For simplifying the settings, I created a symbolic link to <code>~/Applications/spark</code>, in particular using <code>ln -s spark-2.1.0-bin-hadoop2.7 spark</code>, yielding the following structure:</p>
+<div class="highlight"><pre><span></span><code><span class="o">~/</span><span class="n">Applications</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">spark</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">spark</span><span class="o">-</span><span class="mf">2.1.0</span><span class="o">-</span><span class="n">bin</span><span class="o">-</span><span class="n">hadoop2</span><span class="mf">.7</span>
+<span class="err">└──</span><span class="w"> </span><span class="n">spark</span><span class="o">-</span><span class="mf">2.1.0</span><span class="o">-</span><span class="n">bin</span><span class="o">-</span><span class="n">hadoop2</span><span class="mf">.7</span>
+</code></pre></div>
+
+<h2 id="environment-variables">Environment variables</h2>
+<p>Next step, is to set environment variables.
+In particular, I added the following lines to <code>~/.bash_profile</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">SPARK_HOME</span><span class="o">=</span><span class="s2">&quot;/Users/user/Applications/spark&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PYSPARK_SUBMIT_ARGS</span><span class="o">=</span><span class="s2">&quot;--master local[2]&quot;</span>
+<span class="c1"># Make pyspark available anywhere</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$SPARK_HOME</span><span class="s2">/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<p><em>Remark:</em> <code>spark-shell</code> (i.e. the scala based REPL) should also be accessible at this point.</p>
+<h2 id="test">Test</h2>
+<p>Now, it is time fore testing.
+Start a new terminal session, or source <code>/.bash_profile</code>.
+Now, simply run <code>pyspark</code>.
+You should get a Python REPL console with the <code>SparkContext</code> already loaded as <code>sc</code>.
+Tryout:</p>
+<div class="highlight"><pre><span></span><code><span class="n">x</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+</code></pre></div>
+
+<p>and create a simple RDD.</p>
+<h1 id="use-ipython-and-jupyter">Use <code>IPython</code> and <code>Jupyter</code></h1>
+<p>The standard Python REPL is, somehow, crappy.
+You probably want to use <code>IPython</code> and even better <code>Jupyter</code>.
+To that end, I added the following to my <code>./bash_profile</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">PYSPARK_PYTHON</span><span class="o">=</span>/Users/drorata/anaconda3
+<span class="nb">export</span><span class="w"> </span><span class="nv">PYSPARK_DRIVER_PYTHON</span><span class="o">=</span>/Users/drorata/anaconda3/bin/ipython
+<span class="nb">alias</span><span class="w"> </span><span class="nv">pysparknb</span><span class="o">=</span><span class="s1">&#39;PYSPARK_DRIVER_PYTHON=&quot;jupyter&quot; PYSPARK_DRIVER_PYTHON_OPTS=&quot;notebook&quot; pyspark&#39;</span>
+</code></pre></div>
+
+<p>This way, whenever I invoke <code>pyspark</code> a nice IPython console is started.
+In addition <code>pysparknb</code> starts a Jupyter server in the current directory.</p>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/Jan/16/installing-spark-on-macos-sierra/index.html';
+      this.page.identifier = 'installing-spark-on-macos-sierra';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

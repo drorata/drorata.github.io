@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Group by date from a column | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/Jul/03/group-by-date-from-a-column/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="(Original notebooks can be found in this gist) Assume you have data set as follows: ID Date Value x x x where each row contains an ID, a date (given as pd.Datetime) and a value. The objective is to count how many rows occur in each day. import pandas …">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Group by date from a column
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-07-03T00:00:00+02:00">
+        <i class="fas fa-clock"></i>
+        Mon 03 July 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/howto.html">HowTo</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/python.html">#python</a>,         <a href="../../../../../tag/pandas.html">#pandas</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <p>(Original notebooks can be found in <a href="https://gist.github.com/drorata/315da662702ba82cb70b75d275314ac9">this gist</a>)</p>
+<p>Assume you have data set as follows:</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Date</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+</tr>
+</tbody>
+</table>
+<p>where each row contains an ID, a date (given as <code>pd.Datetime</code>) and a value.
+The objective is to count how many rows occur in each day.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">random</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">random_date</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a random datetime between `start` and `end`</span>
+
+<span class="sd">    Thanks to https://stackoverflow.com/a/8170651/671013</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">start</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span>
+        <span class="c1"># Get a random amount of seconds between `start` and `end`</span>
+        <span class="n">seconds</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">((</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">())),</span>
+    <span class="p">)</span>
+</code></pre></div>
+
+<p>Let's generate a random data set:</p>
+<div class="highlight"><pre><span></span><code><span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">random_date</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)],</span>
+        <span class="s2">&quot;val&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Magic:</strong></p>
+<p>(Based on <a href="https://stackoverflow.com/a/11397052/671013">this answer</a>)</p>
+<div class="highlight"><pre><span></span><code><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">month</span><span class="p">),</span>
+     <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">day</span><span class="p">)]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nx">date</span><span class="w">  </span><span class="nx">date</span>
+<span class="w">    </span><span class="mi">5</span><span class="w">     </span><span class="mi">1</span><span class="w">       </span><span class="mi">4</span>
+<span class="w">          </span><span class="mi">2</span><span class="w">       </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">3</span><span class="w">       </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">4</span><span class="w">       </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">5</span><span class="w">       </span><span class="mi">4</span>
+<span class="w">          </span><span class="mi">6</span><span class="w">       </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">7</span><span class="w">       </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">9</span><span class="w">       </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">10</span><span class="w">      </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">11</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">12</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">13</span><span class="w">      </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">14</span><span class="w">      </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">15</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">16</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">17</span><span class="w">      </span><span class="mi">4</span>
+<span class="w">          </span><span class="mi">19</span><span class="w">      </span><span class="mi">4</span>
+<span class="w">          </span><span class="mi">20</span><span class="w">      </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">21</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">22</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">24</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">25</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">26</span><span class="w">      </span><span class="mi">3</span>
+<span class="w">          </span><span class="mi">27</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">28</span><span class="w">      </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">29</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">31</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">    </span><span class="mi">6</span><span class="w">     </span><span class="mi">1</span><span class="w">       </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">2</span><span class="w">       </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">3</span><span class="w">       </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">4</span><span class="w">       </span><span class="mi">3</span>
+<span class="w">          </span><span class="mi">5</span><span class="w">       </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">6</span><span class="w">       </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">7</span><span class="w">       </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">9</span><span class="w">       </span><span class="mi">4</span>
+<span class="w">          </span><span class="mi">10</span><span class="w">      </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">11</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">12</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">13</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">15</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">16</span><span class="w">      </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">18</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">19</span><span class="w">      </span><span class="mi">5</span>
+<span class="w">          </span><span class="mi">20</span><span class="w">      </span><span class="mi">3</span>
+<span class="w">          </span><span class="mi">21</span><span class="w">      </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">23</span><span class="w">      </span><span class="mi">3</span>
+<span class="w">          </span><span class="mi">24</span><span class="w">      </span><span class="mi">3</span>
+<span class="w">          </span><span class="mi">26</span><span class="w">      </span><span class="mi">2</span>
+<span class="w">          </span><span class="mi">27</span><span class="w">      </span><span class="mi">3</span>
+<span class="w">          </span><span class="mi">29</span><span class="w">      </span><span class="mi">1</span>
+<span class="w">          </span><span class="mi">30</span><span class="w">      </span><span class="mi">3</span>
+<span class="w">    </span><span class="nx">dtype</span><span class="p">:</span><span class="w"> </span><span class="nx">int64</span>
+</code></pre></div>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/Jul/03/group-by-date-from-a-column/index.html';
+      this.page.identifier = 'group-by-date-from-a-column';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

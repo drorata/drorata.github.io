@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Why do we need to divide by n-1? | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/Sep/02/why-do-we-need-to-divide-by-n-1/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="Trying to give an intuitive understanding what's the difference between a biased and unbiased estimators of variance of a sample.">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Why do we need to divide by n-1?
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-09-02T00:00:00+02:00">
+        <i class="fas fa-clock"></i>
+        Sat 02 September 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/stats.html">Stats</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/python.html">#python</a>,         <a href="../../../../../tag/pandas.html">#pandas</a>,         <a href="../../../../../tag/numpy.html">#numpy</a>,         <a href="../../../../../tag/std.html">#std</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <p>(Original post can be found in <a href="https://gist.github.com/drorata/9f9f82380e56c00c297cce019c2da06b">this gist</a>)</p>
+<p>It seems to be a reappearing question: <em>what is the difference between <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.std.html"><code>pandas.std</code></a> and <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.std.html"><code>numpy.std</code></a>?</em>.
+See for example <a href="https://stackoverflow.com/q/24984178/671013">this</a> SO thread.
+But what does it mean that Pandas uses the unbiased estimator and Numpy does not?
+In this post I would like to help you understand what is the difference and when which should be used.
+I will try to achieve this by following the paper <em>"Why divide by <span class="math">\(N-1\)</span>?"</em> by J. L. M. Wilkins <a href="http://www.soe.vt.edu/tandl/pdf/Wilkins/Publications_Wilkins_Why_divide_by_n_1.pdf">(link)</a>.
+In particular instead of using archaic software, I will redo the examples using Numpy and Pandas.</p>
+<h2 id="background">Background</h2>
+<p>What is the average and the standard deviation of height of humans?
+To answer this question, let us denote by <span class="math">\(X\)</span> the <em>whole</em> population of humanity (at the moment); each individual would be denoted by <span class="math">\(X_i\)</span>.
+The average (or mean), denoted by <span class="math">\(\mu\)</span> can be computed by </p>
+<div class="math">$$\mu = \frac{\sum_{i=1}^N X_i}{N}$$</div>
+<p> where <span class="math">\(N\)</span> is the number of individuals.
+Next, the standard deviation is given by: </p>
+<div class="math">$$\sigma = \sqrt{\frac{\sum_{i=1}^N (X_i - \mu)^2}{N}}$$</div>
+<p>
+Recall that the variance is given and denoted by <span class="math">\(\sigma^2\)</span>; we will consider the variance from now on.</p>
+<p>The task at hand is, obviously, impossible to accomplish.
+What you are likely to do is pick a sample <span class="math">\(X_{i(1)}, X_{i(2)}, \dots, X_{i(n)}\)</span>, where <span class="math">\(n &lt; N\)</span> and <span class="math">\(i(k)\)</span> is a permutation.
+For the sake of simplicity, let us denote them by <span class="math">\(X_i\)</span> where <span class="math">\(i=1,\dots,n\)</span>.
+Using this sample you will compute the sample mean, denoted by <span class="math">\(\bar{X}\)</span> and the sample variance.</p>
+<p>The first part, that is, the mean of the sample, is easy: </p>
+<div class="math">$$\bar{X} = \frac{\sum_{j=1}^n X_j}{n}$$</div>
+<p>
+It turns out that <span class="math">\(\bar{X}\)</span> is an <em>unbiased</em> estimator of <span class="math">\(\mu\)</span>.
+Intuitively saying that it estimates nicely the real mean <span class="math">\(\mu\)</span>.
+See for example <a href="https://en.wikipedia.org/wiki/Bias_of_an_estimator#cite_note-JohnsonWichern2007-1">reference</a>.</p>
+<p>Things become trickier when it comes to the sample's variance, denoted by <span class="math">\(S^2\)</span>.
+One may try to compute <span class="math">\(S^2\)</span> by "generalizing" the formula for <span class="math">\(\sigma^2\)</span>.</p>
+<p>This would be denoted by <span class="math">\(S_n^2\)</span>: </p>
+<div class="math">$$S_n^2 = \frac{\sum_{i=1}^n(X_i - \bar{X})^2}{n}$$</div>
+<p>
+However, this <em>is</em> biased estimator of <span class="math">\(\sigma^2\)</span>.
+The unbiased estimator is </p>
+<div class="math">$$S^2 = \frac{\sum_{i=1}^n(X_i - \bar{X})^2}{n-1}$$</div>
+<p>All this is explained nicely, and in a deeper way, in various places; even <a href="https://en.wikipedia.org/wiki/Bias_of_an_estimator">Wikipedia</a> is a good start.
+An intuitive explanation can be found <a href="https://stats.stackexchange.com/q/3931/54320">here</a>.
+In this post, I will follow the examples of Wilkins which gives a better motivation that indeed <span class="math">\(S_n^2\)</span> is biased and <span class="math">\(S^2\)</span> is not.</p>
+<h2 id="let-the-game-begin">Let the game begin</h2>
+<p>Before we start, let us stress that by default, <code>pandas.std</code> is equivalent to <span class="math">\(S^2\)</span> and <code>numpy.std</code> to <span class="math">\(S_n^2\)</span>.</p>
+<div class="highlight"><pre><span></span><code><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1">#</span>
+<span class="c1"># In general tqdm is great and I strongly suggest to try it out, if you run this notebook</span>
+<span class="c1"># locally. However, it doesn&#39;t render well in the post generated from this notebook. So I define</span>
+<span class="c1"># A dummy function which does nothing.</span>
+<span class="c1">#</span>
+<span class="c1"># from tqdm import tqdm_notebook as tqdm</span>
+<span class="k">def</span> <span class="nf">tqdm</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">X</span>
+</code></pre></div>
+
+<p>We start with a population <span class="math">\(a\)</span> consisting of the numbers <span class="math">\(1\)</span> to <span class="math">\(100\)</span> (inclusive).</p>
+<div class="highlight"><pre><span></span><code><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">101</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The mean <span class="math">\(\mu\)</span> is</p>
+<div class="highlight"><pre><span></span><code><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">50.5</span>
+</code></pre></div>
+
+<p>Next, we compute <span class="math">\(\sigma^2\)</span>; we use the default behavior of <code>np.std</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">833.25</span>
+</code></pre></div>
+
+<p>We can double check that indeed Numpy delivers:</p>
+<div class="highlight"><pre><span></span><code><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">833.25</span>
+</code></pre></div>
+
+<p>By default, Pandas will fail:</p>
+<div class="highlight"><pre><span></span><code><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">841.66666666666663</span>
+</code></pre></div>
+
+<p>But this can be fixed:</p>
+<div class="highlight"><pre><span></span><code><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">833.25</span>
+</code></pre></div>
+
+<p>Great, this all aligns well with the documentation and the definitions.
+In the sequence of values you have covers the <em>WHOLE</em> of the population in question, you should either use <code>np.std</code> or <code>pd.std(ddof=2)</code>.</p>
+<h2 id="sample-the-whole-population">Sample the whole population</h2>
+<p>Time to play the game.
+As we cannot have all values for all the individuals in our population, we have to use a sample.
+We will now do it for various sample sizes.
+At each step we will compute <span class="math">\(S^2\)</span> and <span class="math">\(S_n^2\)</span> and compare the results.
+We take sample sizes of <span class="math">\(n = 5, 10, 25, 50\)</span> and <span class="math">\(100\)</span>.
+For each sample size, we compute <span class="math">\(15000\)</span> times <span class="math">\(S^2\)</span> and <span class="math">\(S_n^2\)</span>.
+Lastly, we average the results for each sample size.</p>
+<div class="highlight"><pre><span></span><code><span class="n">SIZES</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+<span class="n">N</span><span class="o">=</span><span class="mi">15000</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">Sn_s</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">SIZE</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">SIZES</span><span class="p">):</span>
+    <span class="n">size_res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)):</span>
+        <span class="n">size_res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">SIZE</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">Sn_s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">size_res</span><span class="p">))</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">Sn_s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">Sn_s</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">SIZES</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">S_s</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">SIZE</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">SIZES</span><span class="p">):</span>
+    <span class="n">size_res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)):</span>
+        <span class="n">size_res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">SIZE</span><span class="p">),</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">S_s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">size_res</span><span class="p">))</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="n">S_s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">S_s</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">SIZES</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Let's collect the results into a table.</p>
+<div class="highlight"><pre><span></span><code><span class="n">res_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">Sn_s</span><span class="p">,</span> <span class="n">S_s</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;S_n^2&#39;</span><span class="p">,</span> <span class="s1">&#39;S^2&#39;</span><span class="p">])</span>
+<span class="n">res_df</span><span class="p">[</span><span class="s1">&#39;sigma^2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">res_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">index</span><span class="o">=</span><span class="n">res_df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">res_df</span>
+</code></pre></div>
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>S_n^2</th>
+      <th>S^2</th>
+      <th>sigma^2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>5</th>
+      <td>665.030288</td>
+      <td>837.021747</td>
+      <td>833.25</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>748.445851</td>
+      <td>836.054854</td>
+      <td>833.25</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>800.563841</td>
+      <td>832.693469</td>
+      <td>833.25</td>
+    </tr>
+    <tr>
+      <th>50</th>
+      <td>816.226962</td>
+      <td>830.447212</td>
+      <td>833.25</td>
+    </tr>
+    <tr>
+      <th>100</th>
+      <td>825.145818</td>
+      <td>833.501119</td>
+      <td>833.25</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><code><span class="n">res_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">res_df</span><span class="o">.</span><span class="n">index</span><span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/divide-dy-n-1_23_0.png"></p>
+<p>Recall that <span class="math">\(\sigma^2 = 833.25\)</span>.
+It is clear that the <span class="math">\(n-1\)</span> normalization yields better approximation of the variance of the population.
+This approximation is already fairly accurate when using mere <span class="math">\(5\%\)</span> of the population as a sample.</p>
+<h2 id="summary">Summary</h2>
+<p>So, if you know that the series of values that you have represents <em>ALL</em> members of your population, you should go ahead and use <span class="math">\(\sigma^2\)</span> (using either <code>np.std</code> or <code>pandas.std(ddof=0)</code>).
+If however, your series of values is merely a sample of a bigger population, then you should use the unbiased estimator of <span class="math">\(\sigma^2\)</span>, denoted by <span class="math">\(S^2\)</span> and computed by either <code>np.std(ddof=1)</code> or <code>pandas.std</code>.</p>
+<h2 id="an-experiment">An experiment</h2>
+<p>As a mathematician, I now ask myself how would estimators with different <span class="math">\(n\)</span> would behave.
+Let </p>
+<div class="math">$$D_n^2 = \frac{\sum_{i=1}^n(X_i - \bar{X})^2}{n}$$</div>
+<p>
+In particular, <span class="math">\(D_n^2 = S_n^2\)</span> and <span class="math">\(D_{n-1}^2 = S^2\)</span>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">)):</span>
+    <span class="n">Dn_s</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">SIZE</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">SIZES</span><span class="p">):</span>
+        <span class="n">size_res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)):</span>
+            <span class="n">size_res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">SIZE</span><span class="p">),</span> <span class="n">ddof</span><span class="o">=</span><span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">Dn_s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">size_res</span><span class="p">))</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
+    <span class="n">Dn_s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">Dn_s</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">SIZES</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+    <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Dn_s</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">df_res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+<span class="n">df_res</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">logy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">df_res</span><span class="o">.</span><span class="n">index</span><span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/divide-dy-n-1_26_0.png"></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/Sep/02/why-do-we-need-to-divide-by-n-1/index.html';
+      this.page.identifier = 'why-do-we-need-to-divide-by-n-1';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

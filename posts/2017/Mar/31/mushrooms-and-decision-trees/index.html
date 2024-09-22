@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Mushrooms and decision trees | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/Mar/31/mushrooms-and-decision-trees/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="Playing around with decision trees on a dataset of mushrooms">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Mushrooms and decision trees
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-03-31T00:00:00+02:00">
+        <i class="fas fa-clock"></i>
+        Fri 31 March 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/ml.html">ML</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/decision.html">#decision</a>,         <a href="../../../../../tag/trees.html">#trees</a>,         <a href="../../../../../tag/python.html">#python</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <h2 id="preface">Preface</h2>
+<p>I have posted a notebook on GitHub where I explore a dataset of mushrooms.
+This dataset together with simple decision trees lets you decide whether a mushroom is poisonous or not.
+Still, using this model in real life is on your own risk!</p>
+<p>The initial version of the <a href="https://github.com/drorata/mushrooms-ml/blob/fe36adc90f78b32dc2b9cbfadf5d9516ca090986/Summary.ipynb">Notebook</a> is "pasted" here as a markdown.
+Note that there might be changes and updates to the notebook, which you can check directly in the <a href="https://github.com/drorata/mushrooms-ml">repository</a>.</p>
+<hr>
+
+<p>I learned about the mushroom dataset recently.
+This dataset taught me a lesson worthy sharing, and this is what I would like to do in this notebook.
+I hope the examples below will help you:</p>
+<ul>
+<li>Get started with decision trees</li>
+<li>Understand better some of the possible tunings</li>
+<li>Learn about a common pitfall</li>
+</ul>
+<h2 id="exploring-the-mushrooms-dataset">Exploring the Mushrooms dataset</h2>
+<p>You can find the dataset <a href="https://archive.ics.uci.edu/ml/datasets/Mushroom">here</a>.
+The main objective is to predict what is the class of the mushroom; is it edible or poisons.
+<img src="../../../../../images/mushroom-ml.jpg" alt="Mushroom" style="width: 200px;"/></p>
+<p>So, let's get started!
+Let us start with the must-have includes; we will include further modules later upon need.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">)</span> <span class="c1"># Have a nicer style of the plots</span>
+</code></pre></div>
+
+<p><a href="http://pandas.pydata.org/">Pandas</a> provides an easy and straightforward API to read the CSV into a <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html"><code>DataFrame</code></a>.
+The as obtained from the repository above doesn't have headers, therefore I created a <a href="https://gist.github.com/drorata/d271aaa75a2322ad70617fe0fd5e4b92">new CSV</a> which is ready for importing.</p>
+<div class="highlight"><pre><span></span><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;./mushrooms.csv&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Probably, the very first step is to have a look at the data:</p>
+<div class="highlight"><pre><span></span><code><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>class</th>
+      <th>cap-shape</th>
+      <th>cap-surface</th>
+      <th>cap-color</th>
+      <th>bruises</th>
+      <th>odor</th>
+      <th>gill-attachment</th>
+      <th>gill-spacing</th>
+      <th>gill-size</th>
+      <th>gill-color</th>
+      <th>...</th>
+      <th>stalk-surface-below-ring</th>
+      <th>stalk-color-above-ring</th>
+      <th>stalk-color-below-ring</th>
+      <th>veil-type</th>
+      <th>veil-color</th>
+      <th>ring-number</th>
+      <th>ring-type</th>
+      <th>spore-print-color</th>
+      <th>population</th>
+      <th>habitat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>p</td>
+      <td>x</td>
+      <td>s</td>
+      <td>n</td>
+      <td>t</td>
+      <td>p</td>
+      <td>f</td>
+      <td>c</td>
+      <td>n</td>
+      <td>k</td>
+      <td>...</td>
+      <td>s</td>
+      <td>w</td>
+      <td>w</td>
+      <td>p</td>
+      <td>w</td>
+      <td>o</td>
+      <td>p</td>
+      <td>k</td>
+      <td>s</td>
+      <td>u</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>e</td>
+      <td>x</td>
+      <td>s</td>
+      <td>y</td>
+      <td>t</td>
+      <td>a</td>
+      <td>f</td>
+      <td>c</td>
+      <td>b</td>
+      <td>k</td>
+      <td>...</td>
+      <td>s</td>
+      <td>w</td>
+      <td>w</td>
+      <td>p</td>
+      <td>w</td>
+      <td>o</td>
+      <td>p</td>
+      <td>n</td>
+      <td>n</td>
+      <td>g</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>e</td>
+      <td>b</td>
+      <td>s</td>
+      <td>w</td>
+      <td>t</td>
+      <td>l</td>
+      <td>f</td>
+      <td>c</td>
+      <td>b</td>
+      <td>n</td>
+      <td>...</td>
+      <td>s</td>
+      <td>w</td>
+      <td>w</td>
+      <td>p</td>
+      <td>w</td>
+      <td>o</td>
+      <td>p</td>
+      <td>n</td>
+      <td>n</td>
+      <td>m</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>p</td>
+      <td>x</td>
+      <td>y</td>
+      <td>w</td>
+      <td>t</td>
+      <td>p</td>
+      <td>f</td>
+      <td>c</td>
+      <td>n</td>
+      <td>n</td>
+      <td>...</td>
+      <td>s</td>
+      <td>w</td>
+      <td>w</td>
+      <td>p</td>
+      <td>w</td>
+      <td>o</td>
+      <td>p</td>
+      <td>k</td>
+      <td>s</td>
+      <td>u</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>e</td>
+      <td>x</td>
+      <td>s</td>
+      <td>g</td>
+      <td>f</td>
+      <td>n</td>
+      <td>f</td>
+      <td>w</td>
+      <td>b</td>
+      <td>k</td>
+      <td>...</td>
+      <td>s</td>
+      <td>w</td>
+      <td>w</td>
+      <td>p</td>
+      <td>w</td>
+      <td>o</td>
+      <td>e</td>
+      <td>n</td>
+      <td>a</td>
+      <td>g</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 23 columns</p>
+</div>
+
+<p>It seems like all features have categorical values.
+This can also be validated if you look at the description of the dataset.</p>
+<p>What are we facing?
+The data size is</p>
+<div class="highlight"><pre><span></span><code><span class="n">df</span><span class="o">.</span><span class="n">shape</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>(8124, 23)
+</code></pre></div>
+
+<p>That is, we have 8K rows and 23 features. Nice.</p>
+<p>Should we be handling missing data?</p>
+<div class="highlight"><pre><span></span><code><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>False
+</code></pre></div>
+
+<p>Next, it is important to figure out what are the classes we have.</p>
+<div class="highlight"><pre><span></span><code><span class="n">df</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="nx">e</span><span class="w">    </span><span class="mi">4208</span>
+<span class="nx">p</span><span class="w">    </span><span class="mi">3916</span>
+<span class="nx">Name</span><span class="p">:</span><span class="w"> </span><span class="kd">class</span><span class="p">,</span><span class="w"> </span><span class="nx">dtype</span><span class="p">:</span><span class="w"> </span><span class="nx">int64</span>
+</code></pre></div>
+
+<p>Indeed, each mushroom has one of two classes <code>e</code> for edible and <code>p</code> for poisons.</p>
+<p>Next, let's check how many values each attribute has</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>[2, 6, 4, 10, 2, 9, 2, 2, 2, 12, 2, 5, 4, 4, 9, 9, 1, 4, 3, 5, 9, 6, 7]
+</code></pre></div>
+
+<p>Not too bad.</p>
+<p>For the sake of simplicity, we split the <code>DataFrame</code> into the target and attributes denoted as <code>Y</code> and <code>X</code>, respectively.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+</code></pre></div>
+
+<p>Since the data we have is categorical it is very standard and recommended to use the dummy representation.
+You can read more either <a href="https://en.wikipedia.org/wiki/Categorical_variable">here (wiki)</a> or <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.get_dummies.html">here (Pandas)</a> to learn a little more.</p>
+<div class="highlight"><pre><span></span><code><span class="n">X_dummy</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">Y_dummy</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="s1">&#39;e&#39;</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+
+<p>We can understand the structure of the dummy version of <code>X</code> by looking into a specific column.
+The <code>bruises</code> column has two possible categorical values:</p>
+<div class="highlight"><pre><span></span><code><span class="n">df</span><span class="o">.</span><span class="n">bruises</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="nx">array</span><span class="p">([</span><span class="sc">&#39;t&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;f&#39;</span><span class="p">],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">object</span><span class="p">)</span>
+</code></pre></div>
+
+<p>In turn, in <code>X_dummy</code> there are two columns related to <code>df.bruises</code>:</p>
+<ul>
+<li><code>X_dummy.bruises_t</code></li>
+<li><code>X_dummy.bruises_f</code></li>
+</ul>
+<p>The entry in <code>X_dummy</code> corresponding to an entry in <code>X</code> that had <code>t</code> as the value for <code>bruises</code> will have <code>1</code> and <code>0</code> in the columns <code>bruises_t</code> and <code>bruises_f</code>, respectively.</p>
+<p>OK, time to do some ML!</p>
+<h2 id="trees-training">Trees training</h2>
+<p>A simple and very efficient starting point is a decision tree.
+We will start with defaults and try to improve.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">tree</span>
+</code></pre></div>
+
+<p>The first step is to split the dataset into training sets (independent data and target) and to testing sets.
+We first take the most naive approach, for training we will take the first <span class="math">\(n\)</span> lines and for testing the rest.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">naive_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="c1"># Take first n lines of X and Y for training and the rest for testing</span>
+    <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+    <span class="n">X_test</span>  <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
+    <span class="n">Y_train</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+    <span class="n">Y_test</span>  <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">7000</span><span class="p">):</span>
+    <span class="c1"># Given X_dummy and Y_dummy, split naively into training and testing sets</span>
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">naive_split</span><span class="p">(</span><span class="n">X_dummy</span><span class="p">,</span> <span class="n">Y_dummy</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="c1"># Instantiate a default decision tree with fixed random state</span>
+    <span class="c1"># NOTE: In real life you&#39;d probably want to remove the fixed seed.</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+    <span class="c1"># Next, train a default decision tree using the training sets</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+    <span class="c1"># Lastly, return the test sets and the trained model</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">,</span> <span class="n">clf</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Let's inspect how this works.
+<code>train_model()</code> returns a triple, <code>X_test</code> and <code>Y_test</code> are the test sets obtained by a naive split of the data.
+<code>clf</code> is a decision tree model trained on the training sets.
+Lastly, <code>n</code> determines how many points to take for the training sets.
+Here is a simple usage:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Example using the default n=7000</span>
+<span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">,</span> <span class="n">clf</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">()</span>
+</code></pre></div>
+
+<p>For example, we can predict the class of the first point in the test set:</p>
+<div class="highlight"><pre><span></span><code><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">0</span>
+</code></pre></div>
+
+<p>And compare it to the real value:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Y_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">0</span>
+</code></pre></div>
+
+<p>In this case, the tree managed to predict the right class of the mushroom.</p>
+<p>Next, we need to properly evaluate the tree.
+To that end we load the <code>metrics</code> module:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">sklearn.metrics</span> <span class="k">as</span> <span class="nn">metrics</span>
+</code></pre></div>
+
+<p>As part of the testing we will preform an experiment.
+We will take training sets of increasing sizes and evaluate the <a href="https://en.wikipedia.org/wiki/Accuracy_and_precision"><em>accuracy</em></a> (which is the score in the case of a decision tree), <a href="https://en.wikipedia.org/wiki/Precision_and_recall#Precision"><em>precision</em></a> and the <a href="https://en.wikipedia.org/wiki/Precision_and_recall#Recall"><em>recall</em></a> for each iteration.</p>
+<div class="highlight"><pre><span></span><code><span class="n">sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">Y_dummy</span><span class="p">),</span> <span class="mi">500</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">sizes</span><span class="p">:</span>
+    <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">,</span> <span class="n">clf</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">score</span>     <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span>
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">precision_score</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span>
+    <span class="n">recall</span>    <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">recall_score</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span>
+    <span class="n">result</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">)</span>
+<span class="c1"># Turn the results into a DataFrame</span>
+<span class="c1"># Transposing is needed (you tryout without it)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+<span class="n">result</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Accuracy&#39;</span><span class="p">,</span> <span class="s1">&#39;Precision&#39;</span><span class="p">,</span> <span class="s1">&#39;Recall&#39;</span><span class="p">]</span>
+<span class="n">result</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Size of training set&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Value&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/mushroom-ml_38_0.png"></p>
+<p>As you can see, as soon as the training set's size <span class="math">\(n&gt;5000\)</span> all metrics suggest that the model is a good predictor.
+However, the improvement is very bumpy.
+This should suggest that we have to further improve something as this behavior contradicts the reasonable expectation that the model's performance will improve in a "monotonic" manner.</p>
+<p>To that end, we will try random generation of the training and testing sets.
+This can be easily done using the <a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html"><code>train_test_split</code></a> method from the <code>model_selection</code> module.
+Similarly, we will train trees using generated training sets of increasing sizes.
+In turn, we will evaluate the performances of the trees like before.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">model_selection</span>
+<span class="n">sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">sizes</span><span class="p">:</span>
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">model_selection</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span>
+        <span class="n">X_dummy</span><span class="p">,</span> <span class="n">Y_dummy</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+    <span class="n">score</span>     <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span>
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">precision_score</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span>
+    <span class="n">recall</span>    <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">recall_score</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span>
+    <span class="n">result</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">Y_train</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">)</span>
+<span class="c1"># Turn the results into a DataFrame</span>
+<span class="c1"># Transposing is needed (you can tryout without it)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+<span class="n">result</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Accuracy&#39;</span><span class="p">,</span> <span class="s1">&#39;Precision&#39;</span><span class="p">,</span> <span class="s1">&#39;Recall&#39;</span><span class="p">]</span>
+<span class="n">result</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Metrics measures using random train/test splitting&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Size of training set&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Value&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/mushroom-ml_40_0.png"></p>
+<p>It is worthy trying to think what is the reason behind this significant improvement.
+It seems like there's some hidden order in the rows of the dataset.
+By simply counting the number of poisonous vs. edible mushrooms in the first <span class="math">\(n\)</span>-rows, we can indeed see that, at first, the dataset contains more edible samples.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Counting e(i) and p(i), the number of edible and poisonous mushrums up to the i-th row</span>
+<span class="n">e</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">p</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">Y</span><span class="p">)):</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+    <span class="n">e</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">])</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">])</span>
+<span class="n">type_count</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Edible&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">,</span> <span class="s1">&#39;Poisonous&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">},</span><span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">Y_dummy</span><span class="p">)))</span>
+<span class="n">type_count</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Number of first rows&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/mushroom-ml_42_0.png"></p>
+<p>This image clearly shows us that the majority of samples up to the ~6000th line are edible.
+This can be better visualized (known as stacked area) as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="n">type_count</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">type_count</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">area</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Number of first rows&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Portion&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/mushroom-ml_44_0.png"></p>
+<p>From this visualization you can easily see that more than <span class="math">\(70\%\)</span> of the first <span class="math">\(5000\)</span> data points are edible.
+This order (or lack of randomness 🤔) explains why training the trees using the first <span class="math">\(n\)</span> rows is a bad idea as it trains mostly using edible examples and fails to learn the characteristics of the poisonous ones.
+The <strong>take home message</strong> from this example: <em>"take a random sub-sample for the training/test split"</em>.</p>
+<h2 id="explore-tree-settings">Explore tree settings</h2>
+<p>So far we trained the tree model using the default parameters.
+It is now worthwhile to explore some of the parameters that can be tuned.
+To that end, let us naively take the first 2800 row for training and the rest for testing.
+I chose this number by trail and error; trying to find a number for which the defaults yield nice results with room for improvement.</p>
+<div class="highlight"><pre><span></span><code><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">naive_split</span><span class="p">(</span><span class="n">X_dummy</span><span class="p">,</span> <span class="n">Y_dummy</span><span class="p">,</span> <span class="mi">2800</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Furthermore, we use the following simple function.
+As an input it takes a model's instance and training/testing sets.
+Next it computes the score, precision and recall of the model.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">test_tree</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">,</span> <span class="n">print_res</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">clf</span>       <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+    <span class="n">score</span>     <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span> <span class="c1"># In the decision tree&#39;s classifier case it is the mean accuracy</span>
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">precision_score</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span>
+    <span class="n">recall</span>    <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">recall_score</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span><span class="n">recall</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">print_res</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Accuracy = </span><span class="si">%f</span><span class="s2"> / Precision = </span><span class="si">%f</span><span class="s2"> / Recall = </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">res</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span>
+</code></pre></div>
+
+<p>Let's recall what's the performance of the model using the <a href="http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier">defaults</a> (for the sake of clarity, the defaults are explicitly stated).</p>
+<div class="highlight"><pre><span></span><code><span class="n">clf</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span>
+    <span class="n">criterion</span><span class="o">=</span><span class="s1">&#39;gini&#39;</span><span class="p">,</span>
+    <span class="n">splitter</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span>
+    <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="c1"># we override the default here for the sake of reproducibility</span>
+    <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_impurity_split</span><span class="o">=</span><span class="mf">1e-07</span><span class="p">,</span>
+    <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">presort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">test_tree</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">);</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>Accuracy = 0.740045 / Precision = 0.555077 / Recall = 0.914843
+</code></pre></div>
+
+<h3 id="max_features-parameter"><code>max_features</code> parameter</h3>
+<p>The number of features we have in our dataset equals the number of dummy features.
+We will now look into the influence of this parameter on the performance of the trained trees.
+We will iterate over all the possible values for this parameter while keeping all the other parameters fixed to their defaults.</p>
+<div class="highlight"><pre><span></span><code><span class="n">score</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">precision</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">recall</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">X_dummy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">index</span><span class="p">:</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span>
+        <span class="n">criterion</span><span class="o">=</span><span class="s1">&#39;gini&#39;</span><span class="p">,</span>
+        <span class="n">splitter</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span>
+        <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">max_features</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="c1"># we override the default here for the sake of reproducibility</span>
+        <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_impurity_split</span><span class="o">=</span><span class="mf">1e-07</span><span class="p">,</span>
+        <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">presort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">test_tree</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">,</span> <span class="n">print_res</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">score</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">precision</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">recall</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Accuracy&#39;</span><span class="p">:</span> <span class="n">score</span><span class="p">,</span> <span class="s1">&#39;Precision&#39;</span><span class="p">:</span> <span class="n">precision</span><span class="p">,</span> <span class="s1">&#39;Recall&#39;</span><span class="p">:</span> <span class="n">recall</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Number of features&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Score&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/mushroom-ml_53_0.png"></p>
+<p>Interestingly, tuning the <code>max_features</code> parameter can help us train a better model even without shuffling of the data.
+With <code>max_features = 52</code> all metrics are above <span class="math">\(0.9\)</span>.
+Remember that this is using the naive splitting for training and testing!
+<strong>The take home message</strong> here is: <em>default settings are nice but can be improved</em>.</p>
+<h3 id="max_depth"><code>max_depth</code></h3>
+<div class="highlight"><pre><span></span><code><span class="n">score</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">precision</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">recall</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">index</span><span class="p">:</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span>
+        <span class="n">criterion</span><span class="o">=</span><span class="s1">&#39;gini&#39;</span><span class="p">,</span>
+        <span class="n">splitter</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span>
+        <span class="n">max_depth</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="c1"># we override the default here for the sake of reproducibility</span>
+        <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_impurity_split</span><span class="o">=</span><span class="mf">1e-07</span><span class="p">,</span>
+        <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">presort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">test_tree</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">,</span> <span class="n">print_res</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">score</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">precision</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">recall</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Score&#39;</span><span class="p">:</span> <span class="n">score</span><span class="p">,</span> <span class="s1">&#39;Precision&#39;</span><span class="p">:</span> <span class="n">precision</span><span class="p">,</span> <span class="s1">&#39;Recall&#39;</span><span class="p">:</span> <span class="n">recall</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Number of features&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Score&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/mushroom-ml_56_0.png"></p>
+<h2 id="visualize-the-tree">Visualize the tree</h2>
+<p>We conclude this post with a visualization of the tree itself.
+To that end, we split the dataset and keep <span class="math">\(0.75\%\)</span> for training purposes.
+Next, we train the tree using the defaults.</p>
+<div class="highlight"><pre><span></span><code><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">model_selection</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span>
+        <span class="n">X_dummy</span><span class="p">,</span> <span class="n">Y_dummy</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">clf</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">tree</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">pydotplus</span>
+
+<span class="n">dot_data</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">export_graphviz</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">out_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">class_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;e&#39;</span><span class="p">],</span>
+                                <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rounded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">graph</span> <span class="o">=</span> <span class="n">pydotplus</span><span class="o">.</span><span class="n">graph_from_dot_data</span><span class="p">(</span><span class="n">dot_data</span><span class="p">)</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">create_png</span><span class="p">())</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/mushroom-ml_61_0.png"></p>
+<p>Note that there is one leaf with exactly one (poisonous) sample.
+If we adjust the <code>min_samples_leaf</code> parameter and set it to <span class="math">\(2\)</span>, we could avoid it.</p>
+<div class="highlight"><pre><span></span><code><span class="n">clf</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+<span class="n">dot_data</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">export_graphviz</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">out_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">class_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;e&#39;</span><span class="p">],</span>
+                                <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rounded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">graph</span> <span class="o">=</span> <span class="n">pydotplus</span><span class="o">.</span><span class="n">graph_from_dot_data</span><span class="p">(</span><span class="n">dot_data</span><span class="p">)</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">create_png</span><span class="p">())</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/mushroom-ml_63_0.png"></p>
+<div class="highlight"><pre><span></span><code><span class="n">test_tree</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">);</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>Accuracy = 1.000000 / Precision = 1.000000 / Recall = 1.000000
+</code></pre></div>
+
+<p>In this specific example, there is no change in the performance of the tree; but this is a different story related to the nature of this dataset.</p>
+<h2 id="summary">Summary</h2>
+<p>This is all for this time.
+You can of course continue exploration of the different tuning possibilities on your own!
+This dataset is rather simple and it seems like decision trees are a good option here.
+Still, trusting the trained trees with your life next time when you go and pick mushrooms is a different discussion.
+If you decide to do so, the risk is all yours!</p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/PA255433.JPG/640px-PA255433.JPG" alt="Mushroom"/></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/Mar/31/mushrooms-and-decision-trees/index.html';
+      this.page.identifier = 'mushrooms-and-decision-trees';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

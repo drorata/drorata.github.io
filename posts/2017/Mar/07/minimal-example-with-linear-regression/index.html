@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Minimal example with linear regression | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2017/Mar/07/minimal-example-with-linear-regression/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="Basic and synthetic example how to train a linear regression model.">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  Minimal example with linear regression
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-03-07T00:00:00+01:00">
+        <i class="fas fa-clock"></i>
+        Tue 07 March 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/ml.html">ML</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/linear.html">#linear</a>,         <a href="../../../../../tag/regression.html">#regression</a>,         <a href="../../../../../tag/model.html">#model</a>,         <a href="../../../../../tag/example.html">#example</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <p>(Original notebook can be found in this <a href="https://gist.github.com/drorata/1fd71d528333607f4cfeff8a2108f875">gist</a>)</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">16.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>This is a rather straightforward example of how to train a linear regression model in a 2D case.
+<span class="math">\(X\)</span> is a vector with the independent variables and <span class="math">\(Y\)</span> with the dependent ones.
+In this particular example we synthetically generate points on a linear function while adding noise.</p>
+<div class="highlight"><pre><span></span><code><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">X</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="c1"># sample of X</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>array([ 0.        ,  0.20408163,  0.40816327])
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="mf">1.5</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">+</span> <span class="n">noise</span><span class="p">)</span>
+<span class="n">Y</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="c1"># sample of Y</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>array([-0.37637964,  1.55622455,  1.10414509])
+</code></pre></div>
+
+<p>We start an instance of a <a href="http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html">linear regression</a> model.</p>
+<div class="highlight"><pre><span></span><code><span class="n">regr</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">LinearRegression</span><span class="p">()</span>
+</code></pre></div>
+
+<p>We train it on the synthetic data.</p>
+<div class="highlight"><pre><span></span><code><span class="n">regr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">Y</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1, normalize=False)
+</code></pre></div>
+
+<p>The <code>reshape</code> above is there due to a warning/error you might be seeing if omitted.</p>
+<p>Once trained, the model can be used to predict the values of the points we started with in <span class="math">\(X\)</span>.
+Note, as we are dealing with a linear model, there is no way of ending up with <a href="https://en.wikipedia.org/wiki/Overfitting">over-fitting model</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Y_pred</span> <span class="o">=</span> <span class="n">regr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="c1"># Data</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">,</span><span class="s1">&#39;-o&#39;</span> <span class="c1"># Regression</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Data&#39;</span><span class="p">,</span><span class="s1">&#39;Regression&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Input vs. Regression&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/linear-regression-minimal-example_10_0.png"></p>
+<p>Let's look into the result.
+The linear function to which we added noise was <span class="math">\(y=ax + b\)</span> where the coefficient <span class="math">\(a = 1\)</span> and the intercept <span class="math">\(b=0\)</span>.
+We can compute <span class="math">\(a\)</span> and <span class="math">\(b\)</span> of the trained model.
+<span class="math">\(a\)</span>, a.k.a. the slope, is directly computed by:</p>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="n">Y_pred</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">-</span> <span class="n">Y_pred</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">0.98216273101406792</span>
+</code></pre></div>
+
+<p>It is actually an attribute of the model:</p>
+<div class="highlight"><pre><span></span><code><span class="n">regr</span><span class="o">.</span><span class="n">coef_</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>array([ 0.98216273])
+</code></pre></div>
+
+<p>Similarly, the intercept is merely the value of the model for <span class="math">\(X=0\)</span>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Y_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>-0.073041941893555951
+</code></pre></div>
+
+<p>And again, this is an attribute of the model:</p>
+<div class="highlight"><pre><span></span><code><span class="n">regr</span><span class="o">.</span><span class="n">intercept_</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>-0.073041941893555951
+</code></pre></div>
+
+<p>In the example so far, the noise was uniformly distributed in the <span class="math">\([-1.5,1.5)\)</span> interval.
+Next, we'd like to check the relation between the radius (<span class="math">\(1.5\)</span> in this case) of the noise and the coefficient/intercept of the model.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">gen_data</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">noise_radius</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">noise_radius</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">+</span> <span class="n">noise</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span>
+
+<span class="k">def</span> <span class="nf">train_predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+    <span class="n">regr</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">LinearRegression</span><span class="p">()</span>
+    <span class="n">regr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">Y</span><span class="p">)</span>
+    <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">regr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">regr</span><span class="p">,</span> <span class="n">Y_pred</span>
+</code></pre></div>
+
+<p>Next we are going to generate synthetic data sets with growing noise radius.
+In each iterations, we will register the coefficient and the intercept of the trained model.</p>
+<div class="highlight"><pre><span></span><code><span class="n">coeff</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">inter</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">rads</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">rad</span> <span class="ow">in</span> <span class="n">rads</span><span class="p">:</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">gen_data</span><span class="p">(</span><span class="n">noise_radius</span><span class="o">=</span><span class="n">rad</span><span class="p">)</span>
+    <span class="n">regr</span><span class="p">,</span> <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">train_predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
+    <span class="n">coeff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">regr</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span>
+    <span class="n">inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">regr</span><span class="o">.</span><span class="n">intercept_</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Let's have a look at the behavior of the error between the coefficients and intercepts that we witness and the real ones we used for the generation of the data.</p>
+<div class="highlight"><pre><span></span><code><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">rads</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">coeff</span><span class="p">)),</span> <span class="c1"># we know that the slope we use equals 1</span>
+    <span class="n">rads</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">inter</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Error in Coeffieicents and intercepts vs. Noise radius&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Coefficient error&#39;</span><span class="p">,</span> <span class="s1">&#39;Intercept error&#39;</span><span class="p">]);</span>
+</code></pre></div>
+
+<p><img alt="png" src="../../../../../images/linear-regression-minimal-example_24_0.png"></p>
+<p>The above image suggest that the error of both the coefficient and the intercept linearly depend on the noise radius.</p>
+<p>Formally, the we have samples from a linear function </p>
+<div class="math">$$y = x + \epsilon$$</div>
+<p> where <span class="math">\(\epsilon\)</span> is uniform noise.
+For each <span class="math">\(x_i \in X\)</span> we have a corresponding value <span class="math">\(y_i \in Y\)</span>.
+Our objective is to find <span class="math">\(a\)</span> and <span class="math">\(b\)</span> such that <span class="math">\(y \sim ax +b\)</span>.
+We do so by minimizing the <span class="math">\(L_2\)</span> error </p>
+<div class="math">$$E(a,b) = \sum_{i=1}^n (y_i - (ax_i+b))^2$$</div>
+<p> as a function of <span class="math">\(a\)</span> and <span class="math">\(b\)</span>.
+We take partial derivatives and find the minimum:
+</p>
+<div class="math">$$
+\left\{
+\begin{array}{c}
+\frac{\partial E}{\partial a} = 0 \\
+\frac{\partial E}{\partial b} = 0
+\end{array}
+\right.
+$$</div>
+<p>
+This turns to be:
+</p>
+<div class="math">$$
+\left\{
+\begin{array}{c}
+\sum (y_i - (ax_i +b))x_i = 0 \\
+\sum (y_i - (ax_i +b)) = 0
+\end{array}
+\right.
+$$</div>
+<p>From this, we can have a closed formula for <span class="math">\(a\)</span> and <span class="math">\(b\)</span>:
+</p>
+<div class="math">$$
+\left\{
+\begin{array}{c}
+a = \frac{X \cdot Y - n \bar{X}\bar{Y}}{X \cdot X - n \bar{X}^2} \\
+b = \bar{Y} - a \bar{X}
+\end{array}
+\right.
+$$</div>
+<p>
+Here, <span class="math">\(\bar{X}\)</span> and <span class="math">\(\bar{Y}\)</span> denote the mean of <span class="math">\(X\)</span> and <span class="math">\(Y\)</span>, respectively.
+Furthermore, <span class="math">\(n\)</span> is the number of sample points.
+We can now check the closed formulas, and compare them to the coefficient and intercept of the model we tarined:</p>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Y</span><span class="p">))</span> <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">*</span><span class="n">Y</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="o">/</span>\
+<span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">X</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span><span class="mi">2</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>-0.8010271422548586
+</code></pre></div>
+
+<p>vs.</p>
+<div class="highlight"><pre><span></span><code><span class="n">regr</span><span class="o">.</span><span class="n">coef_</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>array([-0.80102714])
+</code></pre></div>
+
+<p>And:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Y</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">*</span> \
+<span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Y</span><span class="p">))</span> <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">*</span><span class="n">Y</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="o">/</span>\
+<span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">X</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span><span class="mi">2</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">2.8648629210179717</span>
+</code></pre></div>
+
+<p>vs.</p>
+<div class="highlight"><pre><span></span><code><span class="n">regr</span><span class="o">.</span><span class="n">intercept_</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">2.864862921017969</span>
+</code></pre></div>
+
+<p>Lastly, the closed formulas above provide good intuition why the error of the model grows linearly.
+In the future I will explain this in details.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2017/Mar/07/minimal-example-with-linear-regression/index.html';
+      this.page.identifier = 'minimal-example-with-linear-regression';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>

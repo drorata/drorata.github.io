@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>An attempt on smarter logging | Dr. Dror
+</title>
+  <link rel="canonical" href="../../../../../posts/2018/Sep/04/an-attempt-on-smarter-logging/index.html">
+
+
+  <link rel="stylesheet" href="../../../../../theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/fontawesome.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="../../../../../theme/css/theme.css">
+
+
+<meta name="description" content="Motivation Consider the case where you implement some logic somewhere, and this logic should be used from within several different places. Think of a logic and two apps using it. The logic should be yielding logging messages that would be visible as part of the running of the different apps …">
+  <!-- Global site tag (gtag.js) - Google Analytics --> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WH47T9F1TR"></script> 
+  <script> 
+    window.dataLayer = window.dataLayer || []; 
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+
+    gtag('config', 'G-WH47T9F1TR'); 
+  </script>
+
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+<div class="row">
+    <div class="col-sm-4">
+      <a href="../../../../../">
+        <img class="img-fluid rounded" src=../../../../../images/colored-spiral-of-roots.png width=90 height=90 alt="Dr. Dror">
+      </a>
+    </div>
+  <div class="col-sm-8">
+    <h1 class="title"><a href="../../../../../">Dr. Dror</a></h1>
+      <p class="text-muted">Foo is not just a "Bar"</p>
+      <ul class="list-inline">
+            <li class="list-inline-item"><a href="../../../../../pages/about.html">About</a></li>
+              <li class="list-inline-item text-muted">/</li>
+            <li class="list-inline-item"><a href="../../../../../pages/random-work.html">Random work</a></li>
+            <li class=" list-inline-item text-muted">|</li>
+          <li class="list-inline-item"><a class="fab fa-github" href="https://github.com/drorata" target="_blank"></a></li>
+          <li class="list-inline-item"><a class="fab fa-linkedin" href="https://www.linkedin.com/in/atariah" target="_blank"></a></li>
+      </ul>
+  </div>
+</div>    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>  An attempt on smarter logging
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2018-09-04T00:00:00+02:00">
+        <i class="fas fa-clock"></i>
+        Tue 04 September 2018
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-folder-open"></i>
+        <a href="../../../../../category/howto.html">HowTo</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fas fa-tag"></i>
+        <a href="../../../../../tag/python.html">#python</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <h2 id="motivation">Motivation</h2>
+<p>Consider the case where you implement some logic somewhere, and this logic should be used from within several different places.
+Think of a logic and two apps using it.
+The logic should be yielding logging messages that would be visible as part of the running of the different apps.
+And here comes the additional requirement; the first app should use STDOUT for logging and the second should write the log messages to a file.
+Or, another possible requirement could be that the logging format should be different depending on the calling app.</p>
+<p>In other words, the log messages yielded by the logic should merely be piped to one or more handlers managed by the calling app.
+In this example, you will see my workaround this problem.
+I hope you will find this solution helpful.
+Please comment if you have questions, suggestions etc.</p>
+<h2 id="the-solution">The solution</h2>
+<h3 id="start-with-the-logic">Start with the logic</h3>
+<p>Here is a dead simple logic:</p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!python</span>
+<span class="c1"># package1/package1/foo.py</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="n">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">foo_func</span><span class="p">():</span>
+<span class="w">    </span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;__name__ = &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="vm">__name__</span><span class="p">)</span>
+<span class="w">    </span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Info from foo&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The key line here is the definition of the logger (line 5); it is associated with <code>__name__</code>.
+This way, whatever <code>__name__</code> might be, <code>logger</code> will always be a child of the root logger.
+And this is the trick, namely, an app calling this logic should use the root logger.</p>
+<h3 id="the-first-app">The first app</h3>
+<p>Now we can implement the first app:</p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="c1"># package1/package1/app1.py</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">foo</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">ch</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+<span class="n">ch</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+    <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Info from main app1&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;__name__ = &quot;</span> <span class="o">+</span> <span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">foo</span><span class="o">.</span><span class="n">foo_func</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+<p>Note that here the <code>logger</code> is the root one and we can define the handler to be used.</p>
+<h3 id="the-second-app">The second app</h3>
+<p>Similarly to the first one, the second should use the root logger as well.
+Check this out:</p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="c1"># package2/package2/app2.py</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">package1.foo</span> <span class="k">as</span> <span class="nn">foo</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+    <span class="c1"># logger = logging.getLogger(&#39;log_example&#39;)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">ch</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+    <span class="n">ch</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+        <span class="s1">&#39;</span><span class="si">%(levelname)s</span><span class="s1"> &lt;-&gt; </span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Info from main app2&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;__name__ = &quot;</span> <span class="o">+</span> <span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">foo</span><span class="o">.</span><span class="n">foo_func</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+<h2 id="putting-all-together">Putting all together</h2>
+<p>This <a href="https://gitlab.com/drorata/log-example">git repository</a> holds a complete example, including a <code>Dockerfile</code> which allows you to try out this setting.
+Clone the repository and build the docker image.
+Invoke the following from the project's root.</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>log-example<span class="w"> </span>.
+</code></pre></div>
+
+<p>Next, you can simply checkout the different output; compare:</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span>log-example<span class="w"> </span>/package1/package1/app1.py
+</code></pre></div>
+
+<p>which yields:</p>
+<div class="highlight"><pre><span></span><code><span class="mf">2018</span><span class="o">-</span><span class="mf">08</span><span class="o">-</span><span class="mf">30</span><span class="w"> </span><span class="mf">17</span><span class="p">:</span><span class="mf">08</span><span class="p">:</span><span class="mf">31</span><span class="p">,</span><span class="mf">117</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">INFO</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Info</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="n">app1</span>
+<span class="mf">2018</span><span class="o">-</span><span class="mf">08</span><span class="o">-</span><span class="mf">30</span><span class="w"> </span><span class="mf">17</span><span class="p">:</span><span class="mf">08</span><span class="p">:</span><span class="mf">31</span><span class="p">,</span><span class="mf">117</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">INFO</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">__name__</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__main__</span>
+<span class="mf">2018</span><span class="o">-</span><span class="mf">08</span><span class="o">-</span><span class="mf">30</span><span class="w"> </span><span class="mf">17</span><span class="p">:</span><span class="mf">08</span><span class="p">:</span><span class="mf">31</span><span class="p">,</span><span class="mf">117</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">INFO</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">__name__</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">foo</span>
+<span class="mf">2018</span><span class="o">-</span><span class="mf">08</span><span class="o">-</span><span class="mf">30</span><span class="w"> </span><span class="mf">17</span><span class="p">:</span><span class="mf">08</span><span class="p">:</span><span class="mf">31</span><span class="p">,</span><span class="mf">118</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">INFO</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Info</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">foo</span>
+</code></pre></div>
+
+<p>and</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span>log-example<span class="w"> </span>/package2/package2/app2.py
+</code></pre></div>
+
+<p>which yields:</p>
+<div class="highlight"><pre><span></span><code><span class="n">INFO</span><span class="w"> </span><span class="o">&lt;-&gt;</span><span class="w"> </span><span class="m">2018-08-30</span><span class="w"> </span><span class="m">17</span><span class="o">:</span><span class="m">08</span><span class="o">:</span><span class="m">40</span><span class="p">,</span><span class="m">143</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Info</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="n">app2</span>
+<span class="n">INFO</span><span class="w"> </span><span class="o">&lt;-&gt;</span><span class="w"> </span><span class="m">2018-08-30</span><span class="w"> </span><span class="m">17</span><span class="o">:</span><span class="m">08</span><span class="o">:</span><span class="m">40</span><span class="p">,</span><span class="m">143</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">-</span><span class="w"> </span>__<span class="n">name__</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>__<span class="n">main__</span>
+<span class="n">INFO</span><span class="w"> </span><span class="o">&lt;-&gt;</span><span class="w"> </span><span class="m">2018-08-30</span><span class="w"> </span><span class="m">17</span><span class="o">:</span><span class="m">08</span><span class="o">:</span><span class="m">40</span><span class="p">,</span><span class="m">144</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">package1.foo</span><span class="w"> </span><span class="o">-</span><span class="w"> </span>__<span class="n">name__</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">package1.foo</span>
+<span class="n">INFO</span><span class="w"> </span><span class="o">&lt;-&gt;</span><span class="w"> </span><span class="m">2018-08-30</span><span class="w"> </span><span class="m">17</span><span class="o">:</span><span class="m">08</span><span class="o">:</span><span class="m">40</span><span class="p">,</span><span class="m">144</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">package1.foo</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Info</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">foo</span>
+</code></pre></div>
+
+<h3 id="two-things-to-note">Two things to note</h3>
+<p>First, pay attention to the different <code>__name__</code>'s in use.
+Understanding them will help you modify this approach as per your needs.
+Secondly, note the different formatting of the messages.
+This is governed by the definitions in the apps and not all by the logic!
+By defining a different or additional handle, you could, for instance, write the log messages when using the second app to a <a href="https://docs.python.org/3/library/logging.handlers.html#logging.handlers.RotatingFileHandler">rotating file</a>.</p>
+<p>Lastly, thanks to <a href="https://github.com/deeplook">deeplook</a> for his help :)</p>
+<p>That's it.
+Happy logging!</p>
+  </div>
+</article>
+  <hr>
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function() {
+      this.page.url = '../../../../../posts/2018/Sep/04/an-attempt-on-smarter-logging/index.html';
+      this.page.identifier = 'an-attempt-on-smarter-logging';
+    };
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = '//dr-dror.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript class="text-muted">
+    Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+  </noscript>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+<div class="row">
+  <ul class="col-sm-6 list-inline">
+    <li class="list-inline-item"><a href="../../../../../archives.html">Archives</a></li>
+    <li class="list-inline-item"><a href="../../../../../categories.html">Categories</a></li>
+      <li class="list-inline-item"><a href="../../../../../tags.html">Tags</a></li>
+  </ul>
+  <p class="col-sm-6 text-sm-right text-muted">
+    Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a>
+    / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+  </p>
+</div>    </div>
+  </footer>
+
+</body>
+
+</html>
