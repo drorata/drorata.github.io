@@ -1,8 +1,12 @@
 name: deploy website
-on:
-  push:
-    branches:
-      - source
+# on:
+#   push:
+#     branches:
+#       - source
+on: push
+
+env:
+  POETRY_HOME: /opt/poetry
 
 jobs:
   build:
@@ -15,20 +19,22 @@ jobs:
         with:
           python-version: "3.7"
 
-      - name: Install pipenv
-        uses: dschep/install-pipenv-action@v1
+      - name: Install poetry
+        run: |
+          python3 -m venv $POETRY_HOME
+          $POETRY_HOME/bin/pip install poetry==1.2.0
 
       - name: Install dependencies
         run: |
-          pipenv install
+          poetry install --no-root
 
       - name: Install Task
         uses: arduino/setup-task@v1
 
-      - name: Build and publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # PAT to enable the that happens in the task 'publish_https'
-          GIT_PAT: ${{ secrets.MY_PAT }}
-        run: |
-          pipenv run task publish_https
+      # - name: Build and publish
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     # PAT to enable the that happens in the task 'publish_https'
+      #     GIT_PAT: ${{ secrets.MY_PAT }}
+      #   run: |
+      #     poetry run task publish_https

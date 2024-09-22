@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "drorata-github-io-pelican"
+version = "0.1.0"
+description = ""
+authors = ["Dror Atariah <drorata@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "drorata"}]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+markdown = "3.4.1"
+ghp-import = "2.1.0"
+pelican = "4.8.0"
+mistune = "2.0.3"
+jinja2 = "3.0"
+pelican-render-math = "1.0.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# I added this as per the suggestion here:
+# https://github.com/python-poetry/poetry/issues/9293#issuecomment-2048205226
+# Otherwise, I got the error: `Package docutils (0.21.post1) not found.`
+[[tool.poetry.source]]
+name = "pypi-public"
+url = "https://pypi.org/simple/"
