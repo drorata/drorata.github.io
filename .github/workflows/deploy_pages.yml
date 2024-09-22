@@ -5,9 +5,6 @@ name: deploy website
 #       - source
 on: push
 
-env:
-  POETRY_HOME: /opt/poetry
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,12 +14,10 @@ jobs:
           submodules: "true"
       - uses: actions/setup-python@v3
         with:
-          python-version: "3.7"
+          python-version: "3.8"
 
       - name: Install poetry
-        run: |
-          python3 -m venv $POETRY_HOME
-          $POETRY_HOME/bin/pip install poetry==1.2.0
+        run: pip install poetry==1.8.3
 
       - name: Install dependencies
         run: |
