@@ -1,9 +1,9 @@
 name: deploy website
-# on:
-#   push:
-#     branches:
-#       - source
-on: push
+
+on:
+  push:
+    branches:
+      - source
 
 jobs:
   build:
