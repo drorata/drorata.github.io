@@ -1,4 +1,5 @@
 name: deploy website
+
 on:
   push:
     branches:
@@ -13,14 +14,14 @@ jobs:
           submodules: "true"
       - uses: actions/setup-python@v3
         with:
-          python-version: "3.7"
+          python-version: "3.8"
 
-      - name: Install pipenv
-        uses: dschep/install-pipenv-action@v1
+      - name: Install poetry
+        run: pip install poetry==1.8.3
 
       - name: Install dependencies
         run: |
-          pipenv install
+          poetry install --no-root
 
       - name: Install Task
         uses: arduino/setup-task@v1
@@ -31,4 +32,4 @@ jobs:
           # PAT to enable the that happens in the task 'publish_https'
           GIT_PAT: ${{ secrets.MY_PAT }}
         run: |
-          pipenv run task publish_https
+          poetry run task publish_https
